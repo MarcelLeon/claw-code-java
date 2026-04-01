@@ -28,6 +28,12 @@ class ChatSessionRunnerTest {
                         + "/help\n"
                         + "/unknown\n"
                         + "请读取 README\n"
+                        + "/resume\n"
+                        + "/clear\n"
+                        + "/model gpt-4.1-mini\n"
+                        + "/model\n"
+                        + "/status\n"
+                        + "/resume chat-session-test\n"
                         + "请根据历史继续\n"
                         + "/exit\n"
         ).getBytes(StandardCharsets.UTF_8));
@@ -46,6 +52,12 @@ class ChatSessionRunnerTest {
         assertThat(text).contains("/help  查看可用 slash commands");
         assertThat(text).contains("未知命令: /unknown");
         assertThat(text).contains("已执行工具 `read_file`");
+        assertThat(text).contains("Recent conversations:");
+        assertThat(text).contains("Started a new conversation.");
+        assertThat(text).contains("Set model to gpt-4.1-mini");
+        assertThat(text).contains("Current model: gpt-4.1-mini");
+        assertThat(text).contains("model: gpt-4.1-mini");
+        assertThat(text).contains("Resumed conversation chat-session-test.");
         assertThat(text).contains("已加载历史会话");
         assertThat(text).contains("chat ended.");
     }

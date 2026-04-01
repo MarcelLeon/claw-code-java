@@ -23,10 +23,17 @@ public class ChatSlashCommandDispatcher {
      */
     public ChatSlashCommandResult dispatch(ChatSlashCommandRequest request) {
         return commands.stream()
-                .filter(command -> command.name().equalsIgnoreCase(request.commandName()))
+                .filter(command -> matches(command, request.commandName()))
                 .findFirst()
                 .orElseGet(() -> unknownCommand(request.commandName()))
                 .execute(request);
+    }
+
+    private boolean matches(ChatSlashCommand command, String commandName) {
+        if (command.name().equalsIgnoreCase(commandName)) {
+            return true;
+        }
+        return command.aliases().stream().anyMatch(alias -> alias.equalsIgnoreCase(commandName));
     }
 
     private ChatSlashCommand unknownCommand(String commandName) {

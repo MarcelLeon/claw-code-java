@@ -41,7 +41,7 @@ public class ChatSessionRunner {
      */
     public void run(ChatSessionRequest request, InputStream input, PrintStream output) {
         String resolvedSessionId = resolveSessionId(request.sessionId());
-        ChatSessionContext sessionContext = new ChatSessionContext(
+        ChatSessionState sessionState = new ChatSessionState(
                 resolvedSessionId,
                 request.provider(),
                 request.model(),
@@ -68,7 +68,7 @@ public class ChatSessionRunner {
                 if (line.startsWith("/")) {
                     ChatSlashCommandResult commandResult = slashCommandDispatcher.dispatch(parseSlashCommand(
                             line,
-                            sessionContext
+                            sessionState
                     ));
                     printLines(output, commandResult.outputLines());
                     if (commandResult.shouldExit()) {
@@ -79,10 +79,10 @@ public class ChatSessionRunner {
 
                 RunResult result = agentRunnerFacade.run(new RunRequest(
                         line,
-                        request.provider(),
-                        request.model(),
-                        request.baseUrl(),
-                        resolvedSessionId
+                        sessionState.provider(),
+                        sessionState.model(),
+                        sessionState.baseUrl(),
+                        sessionState.sessionId()
                 ));
                 output.println(result.finalAnswer());
                 output.println();
@@ -92,7 +92,7 @@ public class ChatSessionRunner {
         }
     }
 
-    private ChatSlashCommandRequest parseSlashCommand(String line, ChatSessionContext sessionContext) {
+    private ChatSlashCommandRequest parseSlashCommand(String line, ChatSessionState sessionState) {
         String normalized = line.substring(1).trim();
         if ("quit".equalsIgnoreCase(normalized)) {
             normalized = "exit";
@@ -104,7 +104,7 @@ public class ChatSessionRunner {
             commandName = normalized.substring(0, blankIndex);
             argument = normalized.substring(blankIndex + 1).trim();
         }
-        return new ChatSlashCommandRequest(line, commandName, argument, sessionContext);
+        return new ChatSlashCommandRequest(line, commandName, argument, sessionState);
     }
 
     private void printLines(PrintStream output, java.util.List<String> lines) {

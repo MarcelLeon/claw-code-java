@@ -32,8 +32,16 @@ public class HelpSlashCommand implements ChatSlashCommand {
         List<String> lines = Stream.concat(Stream.of(this), commands.stream())
                 .distinct()
                 .sorted(Comparator.comparing(ChatSlashCommand::name))
-                .map(command -> "/" + command.name() + "  " + command.description())
+                .map(command -> formatCommandHelp(command))
                 .toList();
         return ChatSlashCommandResult.output(lines);
+    }
+
+    private String formatCommandHelp(ChatSlashCommand command) {
+        if (command.aliases().isEmpty()) {
+            return "/" + command.name() + "  " + command.description();
+        }
+        return "/" + command.name() + "  " + command.description()
+                + " (aliases: " + String.join(", ", command.aliases()) + ")";
     }
 }

@@ -64,6 +64,27 @@ flowchart TD
     C --> H["TranscriptEntry"]
 ```
 
+对交互式 `chat`，还有一组会话级对象：
+
+- `ChatSessionState`
+  - 表示 REPL 当前选中的会话和模型覆盖
+- `ChatSlashCommand`
+  - 表示一个交互式本地命令
+- `ChatSlashCommandDispatcher`
+  - 负责按名称/别名分发 slash command
+
+它们与 runtime 的关系是：
+
+```mermaid
+flowchart TD
+    A["ChatSessionRunner"] --> B["ChatSessionState"]
+    A --> C["ChatSlashCommandDispatcher"]
+    C --> D["/status /tools /help /exit"]
+    C --> E["/clear /resume /model"]
+    A --> F["AgentRunnerFacade"]
+    B --> F
+```
+
 ## 4. 核心流程
 
 当前的主流程按 Java 习惯拆成三段：
@@ -112,6 +133,7 @@ flowchart TD
 - 渲染终端输出
 - 收口异常
 - 管理交互式 chat 的 slash command 分发
+- 持有 chat 会话级状态，例如当前 `session-id` 和模型覆盖
 
 不负责：
 

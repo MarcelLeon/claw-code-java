@@ -23,10 +23,10 @@ public class StatusSlashCommand implements ChatSlashCommand {
     @Override
     public ChatSlashCommandResult execute(ChatSlashCommandRequest request) {
         return ChatSlashCommandResult.output(List.of(
-                "session: " + request.sessionContext().sessionId(),
-                "provider: " + fallback(request.sessionContext().provider(), "(default)"),
-                "model: " + fallback(request.sessionContext().model(), "(default)"),
-                "base-url: " + fallback(request.sessionContext().baseUrl(), "(default)")
+                "session: " + request.sessionState().sessionId(),
+                "provider: " + fallback(request.sessionState().provider(), "(default)"),
+                "model: " + fallback(request.sessionState().model(), "(default)"),
+                "base-url: " + fallback(request.sessionState().baseUrl(), "(default)")
         ));
     }
 

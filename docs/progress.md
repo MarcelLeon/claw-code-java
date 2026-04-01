@@ -78,6 +78,8 @@
 - 建立 CLI 启动骨架：`RootCommand`、`doctor`、`run`
 - 增加 `chat` 交互式 REPL 入口，并复用同一 runtime 主链路
 - 抽象 chat slash command 模型，支持 `/help`、`/status`、`/tools`、`/exit`
+- 增强 chat 会话控制，支持 `/clear`、`/resume`、`/model`
+- 抽象 `ChatSessionState`，把交互式会话状态从 REPL 逻辑中分离
 - 建立最小 Agent Loop：`AgentRunnerFacade` -> `CodingAgentEngine`
 - 建立模型路由：`mock`、`openai`
 - 建立基础工具：`list_files`、`read_file`、`grep_text`、`bash_exec`、`write_file`
@@ -144,6 +146,7 @@
 - `doctor` CLI 实跑
 - `chat --provider mock --session-id demo-chat` CLI 实跑
 - `chat --provider mock --session-id demo-chat-slash` 下的 `/status`、`/tools`、`/help`、`/exit` CLI 实跑
+- `chat --provider mock --session-id demo-live-session` 下的 `/resume`、`/clear`、`/model` CLI 实跑
 - `java -jar target/coding-agent-cli-0.1.0-SNAPSHOT.jar doctor` 实跑
 - `run --prompt '请读取 README'` CLI 实跑
 - `run --prompt '请执行一个 pwd 命令'` CLI 实跑
@@ -161,6 +164,7 @@
 - 本地 `mock` provider 已完成 CLI -> Agent Loop -> Tool -> Final Answer 的闭环
 - `chat` 已具备最小持续会话体验，并在同一 session 内复用历史 transcript
 - `chat` 的会话控制命令已被抽象为独立模块，而不是散落在 REPL 循环中的条件分支
+- `chat` 已支持会话级控制：新建会话、切换到已有会话、查看/切换当前模型
 - 工具执行结果已能反馈回下一轮模型决策
 - 读、搜、执行命令、写文件四类基础动作均已闭环验证
 - `bash_exec` 已具备基础安全护栏，可拦截典型危险命令并限制执行时长
