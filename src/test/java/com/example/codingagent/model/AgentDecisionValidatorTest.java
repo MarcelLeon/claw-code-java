@@ -3,6 +3,7 @@ package com.example.codingagent.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 class AgentDecisionValidatorTest {
@@ -19,6 +20,17 @@ class AgentDecisionValidatorTest {
     @Test
     void shouldAcceptToolCallDecision() {
         AgentDecision decision = new AgentDecision("读取文件", null, new ToolCall("read_file", "README.md"));
+
+        assertThat(validator.validate(decision)).isSameAs(decision);
+    }
+
+    @Test
+    void shouldAcceptStructuredToolCallDecision() {
+        AgentDecision decision = new AgentDecision(
+                "写入文件",
+                null,
+                new ToolCall("write_file", Map.of("path", "README.md", "content", "hello"))
+        );
 
         assertThat(validator.validate(decision)).isSameAs(decision);
     }
@@ -53,5 +65,14 @@ class AgentDecisionValidatorTest {
         assertThatThrownBy(() -> validator.validate(new AgentDecision(" ", "final", null)))
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessageContaining("summary");
+    }
+
+    @Test
+    void shouldRejectToolCallWithoutAnyArgumentPayload() {
+        assertThatThrownBy(() -> validator.validate(
+                new AgentDecision("坏工具调用", null, new ToolCall("read_file", null, Map.of()))
+        ))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("toolCall.argument/toolCall.arguments");
     }
 }

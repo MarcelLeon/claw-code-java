@@ -41,6 +41,17 @@ class JsonAgentDecisionProtocolTest {
     }
 
     @Test
+    void shouldDecodeStructuredToolArguments() {
+        AgentDecision decision = protocol.decode("""
+                {"summary":"写文件","finalAnswer":null,"toolCall":{"toolName":"write_file","arguments":{"path":"README.md","content":"hello"}}}
+                """);
+
+        assertThat(decision.toolCall()).isNotNull();
+        assertThat(decision.toolCall().toolName()).isEqualTo("write_file");
+        assertThat(decision.toolCall().structuredString("path")).isEqualTo("README.md");
+    }
+
+    @Test
     void shouldRejectBlankContent() {
         assertThatThrownBy(() -> protocol.decode(" "))
                 .isInstanceOf(IllegalStateException.class)

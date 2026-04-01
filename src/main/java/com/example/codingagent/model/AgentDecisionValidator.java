@@ -39,8 +39,8 @@ public class AgentDecisionValidator {
         if (StringUtils.isBlank(toolCall.toolName())) {
             throw new IllegalStateException("模型返回的 toolCall.toolName 为空");
         }
-        if (StringUtils.isBlank(toolCall.argument())) {
-            throw new IllegalStateException("模型返回的 toolCall.argument 为空");
+        if (!toolCall.hasArgumentPayload()) {
+            throw new IllegalStateException("模型返回的 toolCall.argument/toolCall.arguments 为空");
         }
     }
 }

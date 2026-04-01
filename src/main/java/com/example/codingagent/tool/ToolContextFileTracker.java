@@ -6,6 +6,7 @@ import com.example.codingagent.runtime.SessionService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 /**
@@ -49,8 +50,11 @@ public class ToolContextFileTracker {
 
     private String extractRelativePath(ToolCall toolCall) {
         return switch (toolCall.toolName()) {
-            case "read_file" -> toolCall.argument();
-            case "write_file", "patch_file" -> extractJsonPath(toolCall.argument());
+            case "read_file" -> firstNonBlank(toolCall.argument(), toolCall.structuredString("path"));
+            case "write_file", "patch_file" -> firstNonBlank(
+                    toolCall.structuredString("path"),
+                    extractJsonPath(toolCall.resolveArgument(objectMapper))
+            );
             default -> null;
         };
     }
@@ -66,5 +70,15 @@ public class ToolContextFileTracker {
         } catch (IOException ex) {
             return null;
         }
+    }
+
+    private String firstNonBlank(String first, String second) {
+        if (StringUtils.isNotBlank(first)) {
+            return first;
+        }
+        if (StringUtils.isNotBlank(second)) {
+            return second;
+        }
+        return null;
     }
 }

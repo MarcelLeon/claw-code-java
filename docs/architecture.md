@@ -46,6 +46,7 @@
   - 当前只有两种动作：直接回答、调用一个工具
 - `ToolCall`
   - 表示一次工具调用请求
+  - 当前同时兼容旧的字符串 `argument` 和结构化 `arguments`
 - `ToolExecutionResult`
   - 表示工具执行结果
 - `TranscriptEntry`
@@ -209,6 +210,7 @@ flowchart TD
 - prompt builder 和 response parser 可以围绕同一协议对象协作
 - 后续从 JSON 迁移到更强的结构化协议时，影响面更小
 - `/model` 命令看到的“当前模型/默认模型”与真正运行时使用的模型不会分叉
+- 工具层可以先吃下结构化 `arguments`，再逐步向 provider-native function calling 迁移，而不必一次性重写全部工具实现
 
 ### `tool`
 

@@ -2,6 +2,7 @@ package com.example.codingagent.tool;
 
 import com.example.codingagent.model.ToolCall;
 import com.example.codingagent.runtime.AgentRuntimeContext;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -13,10 +14,16 @@ public class ToolExecutor {
 
     private final List<WorkspaceTool> tools;
     private final ToolContextFileTracker toolContextFileTracker;
+    private final ObjectMapper objectMapper;
 
-    public ToolExecutor(List<WorkspaceTool> tools, ToolContextFileTracker toolContextFileTracker) {
+    public ToolExecutor(
+            List<WorkspaceTool> tools,
+            ToolContextFileTracker toolContextFileTracker,
+            ObjectMapper objectMapper
+    ) {
         this.tools = tools;
         this.toolContextFileTracker = toolContextFileTracker;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -31,7 +38,7 @@ public class ToolExecutor {
                 .filter(tool -> tool.supports(toolCall.toolName()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("不支持的工具: " + toolCall.toolName()));
-        ToolExecutionResult result = matchedTool.execute(context, toolCall.argument());
+        ToolExecutionResult result = matchedTool.execute(context, toolCall.resolveArgument(objectMapper));
         toolContextFileTracker.track(context, toolCall, result);
         return result;
     }

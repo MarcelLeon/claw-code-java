@@ -1,6 +1,7 @@
 package com.example.codingagent.model;
 
 import com.example.codingagent.tool.ToolExecutionResult;
+import java.util.Map;
 import java.util.Locale;
 import org.springframework.stereotype.Component;
 
@@ -58,20 +59,22 @@ public class MockAgentModelGateway implements ProviderAgentModelGateway {
             return new AgentDecision(
                     "准备写入工作区文件",
                     null,
-                    new ToolCall(
-                            "write_file",
-                            "{\"path\":\".agent/generated/mock-note.txt\",\"content\":\"mock generated content\\n\"}"
-                    )
+                    new ToolCall("write_file", Map.of(
+                            "path", ".agent/generated/mock-note.txt",
+                            "content", "mock generated content\n"
+                    ))
             );
         }
         if (prompt.contains("补丁") || prompt.contains("patch") || prompt.contains("替换")) {
             return new AgentDecision(
                     "准备按片段修改文件",
                     null,
-                    new ToolCall(
-                            "patch_file",
-                            "{\"path\":\".agent/generated/mock-patch.txt\",\"findText\":\"before\",\"replaceText\":\"after\",\"expectedMatches\":1}"
-                    )
+                    new ToolCall("patch_file", Map.of(
+                            "path", ".agent/generated/mock-patch.txt",
+                            "findText", "before",
+                            "replaceText", "after",
+                            "expectedMatches", 1
+                    ))
             );
         }
         if (prompt.contains("命令") || prompt.contains("shell") || prompt.contains("bash") || prompt.contains("pwd")) {

@@ -30,12 +30,13 @@ public class JsonAgentDecisionProtocol implements AgentDecisionProtocol {
         return List.of(
                 "必须只输出 JSON，不要输出 Markdown、解释或代码块。",
                 "JSON 结构固定如下：",
-                "{\"summary\":\"一句话总结当前动作\",\"finalAnswer\":\"最终回答，若需调用工具则填 null\",\"toolCall\":{\"toolName\":\"工具名\",\"argument\":\"字符串参数\"}}",
+                "{\"summary\":\"一句话总结当前动作\",\"finalAnswer\":\"最终回答，若需调用工具则填 null\",\"toolCall\":{\"toolName\":\"工具名\",\"argument\":\"字符串参数\",\"arguments\":{\"path\":\"src/App.java\"}}}",
                 "规则：",
                 "1. 如果已经拿到足够的工具结果，优先输出 finalAnswer，并将 toolCall 设为 null。",
                 "2. 如果需要查看更多上下文，只能选择一个工具。",
-                "3. toolCall.argument 必须是单个字符串。",
-                "4. 所有路径都使用相对工作区路径。"
+                "3. 简单工具可使用 toolCall.argument；需要结构化输入时优先使用 toolCall.arguments。",
+                "4. toolCall.argument 和 toolCall.arguments 至少提供一个。",
+                "5. 所有路径都使用相对工作区路径。"
         );
     }
 

@@ -88,6 +88,7 @@
 - 为 transcript 记录增加时间戳，并让 `/cost` 输出本地持续时间统计，同时兼容旧 JSONL
 - 增加 chat 内的 `/doctor` 与 `/version`，并让 `/exit` 显式支持 `/quit` 别名
 - 增强 `/model` 语义，支持 help/current 参数、text-mode model selection menu，以及 provider-aware 默认模型解析
+- 增强 JSON 决策协议，支持 `toolCall.argument` 与结构化 `toolCall.arguments` 双栈兼容
 - 抽象 `ChatSessionState`，把交互式会话状态从 REPL 逻辑中分离
 - 建立最小 Agent Loop：`AgentRunnerFacade` -> `CodingAgentEngine`
 - 建立模型路由：`mock`、`openai`
@@ -110,7 +111,7 @@
 
 - 阶段一：已完成并通过测试
 - 阶段二：已完成“真实模型接入骨架”、`openai` provider 路由、base URL 覆盖链路、基础会话续跑、transcript 压缩窗口、可配置 system prompt 组装，以及工作区内安全文件修改能力；chat 会话内的 provider / model / base URL 覆盖也已打通，正在继续增强工具协议和恢复能力
-- 当前增量重点：继续补足 Claude Code 风格的会话命令面，最新已补 `/rename`、`/files`、`/cost`、`/doctor`、`/version`，增强 `/status`，并细化 `/model` 语义和 provider-aware 默认模型
+- 当前增量重点：继续补足 Claude Code 风格的会话命令面，并把现有 JSON 决策协议继续往更强的结构化工具调用演进
 
 ## 5. 当前代码地图
 
@@ -167,6 +168,8 @@
 - `chat --provider mock --session-id smoke-duration-*` 下的 `/cost` 持续时间统计 CLI 实跑
 - `chat --provider mock --session-id smoke-doctor-version` 下的 `/doctor`、`/version`、`/quit` CLI 实跑
 - `chat --provider mock --session-id smoke-model-command-3` 下的 `/model help`、`/model current`、`/provider openai`、`/model` CLI 实跑
+- `chat --provider mock --session-id smoke-structured-tools` 下的结构化 `write_file` 工具调用 CLI 实跑
+- `chat --provider mock --session-id smoke-structured-patch-success` 下的结构化 `patch_file` 工具调用 CLI 实跑
 - `chat` 会话内 `/provider`、`/base-url` 的查看、切换与恢复默认值测试
 - `java -jar target/coding-agent-cli-0.1.0-SNAPSHOT.jar doctor` 实跑
 - `run --prompt '请读取 README'` CLI 实跑
@@ -188,6 +191,7 @@
 - root 默认入口已不再只是帮助页，而是直接落到默认 chat，会话式体验更贴近 Claude Code
 - `chat` 已支持会话级控制：新建会话、切换到已有会话、查看/切换当前 provider、模型和 base URL
 - `/model` 已具备 Claude Code 风格的 help/current/menu 语义，并且 provider 切换后会解析新的默认模型
+- 运行时现在已能同时兼容旧的 `toolCall.argument` 和新的 `toolCall.arguments`，`write_file` / `patch_file` 已经用结构化参数闭环验证
 - `chat` 已支持会话标题：可通过 `/rename` 显式设置，也可基于历史首条用户消息生成 kebab-case 标题
 - `chat` 已支持会话上下文文件索引：`read_file`、`write_file`、`patch_file` 命中的文件会登记到会话元数据，`/files` 可列出当前上下文文件
 - `chat` 已支持基础 `/cost` 视图：当前先基于本地 transcript 统计消息数、字符数和工具输出量，尚未接入真实 provider token/billing
@@ -213,7 +217,7 @@
 
 优先级最高：
 
-- 把当前“JSON 约定式工具调用”升级为更稳的结构化协议
+- 继续把当前“JSON 决策 + 结构化 arguments”升级为更接近 provider-native function calling 的协议
 - 为真实模型增加流式输出
 
 第二优先级：
