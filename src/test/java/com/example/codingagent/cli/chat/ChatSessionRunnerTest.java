@@ -65,8 +65,13 @@ class ChatSessionRunnerTest {
         );
 
         String text = output.toString(StandardCharsets.UTF_8);
+        assertThat(text).contains("app: coding-agent-cli");
+        assertThat(text).contains("workspace: ");
         assertThat(text).contains("session: " + sessionId);
         assertThat(text).contains("title: (untitled)");
+        assertThat(text).contains("api-key: not configured");
+        assertThat(text).contains("connectivity: not checked (run doctor to verify)");
+        assertThat(text).contains("tools: ");
         assertThat(text).contains("messages: total=0, user=0, assistant=0, tool=0");
         assertThat(text).contains("billing: unavailable (provider token usage not tracked yet)");
         assertThat(text).contains("No files in context");
@@ -98,6 +103,7 @@ class ChatSessionRunnerTest {
         assertThat(text).contains("provider: mock");
         assertThat(text).contains("base-url: (default)");
         assertThat(text).contains("context-files: 1");
+        assertThat(text).contains("max-turns: 8");
         assertThat(text).contains("Set base-url to (default)");
         assertThat(text).contains("Set provider to (default)");
         assertThat(text).contains("Resumed conversation " + sessionId + ".");

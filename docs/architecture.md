@@ -53,6 +53,12 @@
 - `SessionMetadata`
   - 表示会话的轻量侧边元数据
   - 当前用于承载 `/rename` 写入的自定义标题，以及 `/files` 所需的上下文文件索引
+- `SessionStatusSummary`
+  - 表示当前会话的状态摘要
+  - 当前用于承载 `/status` 所需的应用版本、工作区、模型配置和工具/上下文统计
+- `SessionCostSummary`
+  - 表示当前会话的本地成本摘要
+  - 当前用于承载 `/cost` 所需的 transcript 计数与上下文统计
 
 这些对象的关系是：
 
@@ -85,7 +91,7 @@ flowchart TD
 flowchart TD
     A["ChatSessionRunner"] --> B["ChatSessionState"]
     A --> C["ChatSlashCommandDispatcher"]
-    C --> D["/status /tools /files /help /exit"]
+    C --> D["/status /tools /files /cost /help /exit"]
     C --> E["/clear /resume /rename /model /provider /base-url"]
     A --> F["AgentRunnerFacade"]
     B --> F

@@ -1,6 +1,7 @@
 package com.example.codingagent.cli.chat.command;
 
-import com.example.codingagent.runtime.SessionService;
+import com.example.codingagent.runtime.SessionStatusSummary;
+import com.example.codingagent.runtime.StatusSummaryService;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -11,10 +12,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class StatusSlashCommand implements ChatSlashCommand {
 
-    private final SessionService sessionService;
+    private final StatusSummaryService statusSummaryService;
 
-    public StatusSlashCommand(SessionService sessionService) {
-        this.sessionService = sessionService;
+    public StatusSlashCommand(StatusSummaryService statusSummaryService) {
+        this.statusSummaryService = statusSummaryService;
     }
 
     @Override
@@ -29,13 +30,25 @@ public class StatusSlashCommand implements ChatSlashCommand {
 
     @Override
     public ChatSlashCommandResult execute(ChatSlashCommandRequest request) {
-        String title = sessionService.getCustomTitle(request.sessionState().sessionId());
+        SessionStatusSummary summary = statusSummaryService.summarize(
+                request.sessionState().sessionId(),
+                request.sessionState().provider(),
+                request.sessionState().model(),
+                request.sessionState().baseUrl()
+        );
         return ChatSlashCommandResult.output(List.of(
-                "session: " + request.sessionState().sessionId(),
-                "title: " + fallback(title, "(untitled)"),
-                "provider: " + fallback(request.sessionState().provider(), "(default)"),
-                "model: " + fallback(request.sessionState().model(), "(default)"),
-                "base-url: " + fallback(request.sessionState().baseUrl(), "(default)")
+                "app: " + summary.applicationName() + " " + fallback(summary.applicationVersion(), "(dev)"),
+                "workspace: " + summary.workspaceRoot(),
+                "session: " + summary.sessionId(),
+                "title: " + fallback(summary.title(), "(untitled)"),
+                "provider: " + fallback(summary.provider(), "(default)"),
+                "model: " + fallback(summary.model(), "(default)"),
+                "base-url: " + fallback(summary.baseUrl(), "(default)"),
+                "api-key: " + (summary.apiKeyConfigured() ? "configured" : "not configured"),
+                "connectivity: not checked (run doctor to verify)",
+                "tools: " + summary.toolCount(),
+                "context-files: " + summary.contextFileCount(),
+                "max-turns: " + summary.maxTurns()
         ));
     }
 

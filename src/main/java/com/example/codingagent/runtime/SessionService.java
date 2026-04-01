@@ -135,6 +135,15 @@ public class SessionService {
     }
 
     /**
+     * 返回当前工作区根目录。
+     *
+     * @return 工作区根目录
+     */
+    public Path workspaceRoot() {
+        return Path.of(agentProperties.getRuntime().getWorkspaceRoot()).toAbsolutePath().normalize();
+    }
+
+    /**
      * 统计当前会话的本地成本摘要。
      *
      * @param sessionId 会话 ID
