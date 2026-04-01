@@ -135,6 +135,47 @@ public class SessionService {
     }
 
     /**
+     * 统计当前会话的本地成本摘要。
+     *
+     * @param sessionId 会话 ID
+     * @return 成本摘要
+     */
+    public SessionCostSummary summarizeCost(String sessionId) {
+        AgentSession session = openSession(sessionId);
+        List<TranscriptEntry> entries = transcriptStore.loadTranscript(session);
+        int userMessages = 0;
+        int assistantMessages = 0;
+        int toolMessages = 0;
+        int totalCharacters = 0;
+        int toolOutputCharacters = 0;
+        for (TranscriptEntry entry : entries) {
+            String content = entry.content() == null ? "" : entry.content();
+            totalCharacters += content.length();
+            switch (entry.role()) {
+                case "user" -> userMessages++;
+                case "assistant" -> assistantMessages++;
+                case "tool" -> {
+                    toolMessages++;
+                    toolOutputCharacters += content.length();
+                }
+                default -> {
+                    // 预留给未来新增 role，不在这里抛错阻塞本地统计。
+                }
+            }
+        }
+        int contextFileCount = sessionMetadataStore.load(session).contextFiles().size();
+        return new SessionCostSummary(
+                entries.size(),
+                userMessages,
+                assistantMessages,
+                toolMessages,
+                totalCharacters,
+                toolOutputCharacters,
+                contextFileCount
+        );
+    }
+
+    /**
      * 返回最近更新的会话列表。
      *
      * @param limit 返回条数

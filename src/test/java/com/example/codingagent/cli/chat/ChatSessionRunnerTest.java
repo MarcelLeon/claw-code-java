@@ -26,6 +26,7 @@ class ChatSessionRunnerTest {
         String sessionId = "chat-session-test-" + UUID.randomUUID();
         ByteArrayInputStream input = new ByteArrayInputStream((
                 "/status\n"
+                        + "/cost\n"
                         + "/files\n"
                         + "/rename\n"
                         + "/provider\n"
@@ -47,9 +48,11 @@ class ChatSessionRunnerTest {
                         + "/provider\n"
                         + "/base-url\n"
                         + "/status\n"
+                        + "/cost\n"
                         + "/provider default\n"
                         + "/base-url default\n"
                         + "/resume " + sessionId + "\n"
+                        + "/cost\n"
                         + "请根据历史继续\n"
                         + "/exit\n"
         ).getBytes(StandardCharsets.UTF_8));
@@ -64,6 +67,8 @@ class ChatSessionRunnerTest {
         String text = output.toString(StandardCharsets.UTF_8);
         assertThat(text).contains("session: " + sessionId);
         assertThat(text).contains("title: (untitled)");
+        assertThat(text).contains("messages: total=0, user=0, assistant=0, tool=0");
+        assertThat(text).contains("billing: unavailable (provider token usage not tracked yet)");
         assertThat(text).contains("No files in context");
         assertThat(text).contains("Could not generate a name: no conversation context yet. Usage: /rename <name>");
         assertThat(text).contains("provider: mock");
@@ -76,6 +81,7 @@ class ChatSessionRunnerTest {
         assertThat(text).contains("- read_file:");
         assertThat(text).contains("/provider  查看或切换当前会话 provider");
         assertThat(text).contains("/base-url  查看或切换当前会话 base URL");
+        assertThat(text).contains("/cost  查看当前会话的本地成本统计");
         assertThat(text).contains("/help  查看可用 slash commands");
         assertThat(text).contains("未知命令: /unknown");
         assertThat(text).contains("已执行工具 `read_file`");
@@ -91,9 +97,11 @@ class ChatSessionRunnerTest {
         assertThat(text).contains("model: gpt-4.1-mini");
         assertThat(text).contains("provider: mock");
         assertThat(text).contains("base-url: (default)");
+        assertThat(text).contains("context-files: 1");
         assertThat(text).contains("Set base-url to (default)");
         assertThat(text).contains("Set provider to (default)");
         assertThat(text).contains("Resumed conversation " + sessionId + ".");
+        assertThat(text).contains("messages: total=3, user=1, assistant=1, tool=1");
         assertThat(text).contains("focused-java-agent");
         assertThat(text).contains("已加载历史会话");
         assertThat(text).contains("chat ended.");
