@@ -5,6 +5,7 @@ package com.example.codingagent.tool;
  */
 public record ToolDescriptor(
         String name,
-        String description
+        String description,
+        ToolArgumentDescriptor argumentDescriptor
 ) {
 }

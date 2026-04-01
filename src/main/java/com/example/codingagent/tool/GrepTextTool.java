@@ -26,6 +26,11 @@ public class GrepTextTool implements WorkspaceTool {
     }
 
     @Override
+    public ToolArgumentDescriptor argumentDescriptor() {
+        return ToolArgumentDescriptor.plainText("要搜索的关键字", "Agent");
+    }
+
+    @Override
     public ToolExecutionResult execute(AgentRuntimeContext context, String argument) {
         List<String> matches = new ArrayList<>();
         try (Stream<Path> paths = Files.walk(context.workspaceRoot(), 3)) {

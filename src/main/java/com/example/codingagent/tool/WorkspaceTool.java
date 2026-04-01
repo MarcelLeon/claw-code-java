@@ -22,6 +22,15 @@ public interface WorkspaceTool {
     String description();
 
     /**
+     * 返回工具参数契约。
+     *
+     * @return 参数契约
+     */
+    default ToolArgumentDescriptor argumentDescriptor() {
+        return ToolArgumentDescriptor.plainText("单个字符串参数", "");
+    }
+
+    /**
      * 是否支持当前工具名。
      *
      * @param toolName 工具名

@@ -32,6 +32,11 @@ public class BashExecTool implements WorkspaceTool {
     }
 
     @Override
+    public ToolArgumentDescriptor argumentDescriptor() {
+        return ToolArgumentDescriptor.plainText("shell 命令字符串", "pwd");
+    }
+
+    @Override
     public ToolExecutionResult execute(AgentRuntimeContext context, String argument) {
         Optional<String> matchedPattern = findBlockedPattern(argument);
         if (matchedPattern.isPresent()) {

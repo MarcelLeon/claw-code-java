@@ -35,6 +35,7 @@
 | `status` / `cost` / `doctor` / `version` 会话视图 | 已对齐 | [StatusSummaryService.java](src/main/java/com/example/codingagent/runtime/StatusSummaryService.java), [CostSlashCommand.java](src/main/java/com/example/codingagent/cli/chat/command/CostSlashCommand.java), [DoctorSlashCommand.java](src/main/java/com/example/codingagent/cli/chat/command/DoctorSlashCommand.java), [VersionSlashCommand.java](src/main/java/com/example/codingagent/cli/chat/command/VersionSlashCommand.java) |
 | Provider / model / base-url 路由 | 已对齐，并补齐 provider-aware 默认模型解析与 `/model` help/current/menu 语义 | [RoutingAgentModelGateway.java](src/main/java/com/example/codingagent/model/RoutingAgentModelGateway.java), [OpenAiAgentModelGateway.java](src/main/java/com/example/codingagent/model/OpenAiAgentModelGateway.java), [ModelSlashCommand.java](src/main/java/com/example/codingagent/cli/chat/command/ModelSlashCommand.java), [ModelSettingService.java](src/main/java/com/example/codingagent/model/ModelSettingService.java), [AgentRuntimeFactory.java](src/main/java/com/example/codingagent/runtime/AgentRuntimeFactory.java) |
 | JSON 决策协议下的结构化工具参数 | 已对齐 | [ToolCall.java](src/main/java/com/example/codingagent/model/ToolCall.java), [JsonAgentDecisionProtocol.java](src/main/java/com/example/codingagent/model/protocol/JsonAgentDecisionProtocol.java), [ToolExecutor.java](src/main/java/com/example/codingagent/tool/ToolExecutor.java), [ToolContextFileTracker.java](src/main/java/com/example/codingagent/tool/ToolContextFileTracker.java) |
+| 显式工具参数契约与 schema-like 提示 | 已对齐 | [ToolArgumentDescriptor.java](src/main/java/com/example/codingagent/tool/ToolArgumentDescriptor.java), [WorkspaceTool.java](src/main/java/com/example/codingagent/tool/WorkspaceTool.java), [ToolCatalog.java](src/main/java/com/example/codingagent/tool/ToolCatalog.java), [OpenAiDecisionPromptBuilder.java](src/main/java/com/example/codingagent/model/OpenAiDecisionPromptBuilder.java), [ToolsSlashCommand.java](src/main/java/com/example/codingagent/cli/chat/command/ToolsSlashCommand.java) |
 | 历史压缩与 prompt 注入治理 | 已对齐 | [OpenAiDecisionPromptBuilder.java](src/main/java/com/example/codingagent/model/OpenAiDecisionPromptBuilder.java), [AgentProperties.java](src/main/java/com/example/codingagent/config/AgentProperties.java) |
 | 工作区路径和 shell 安全护栏 | 已对齐 | [WorkspacePathResolver.java](src/main/java/com/example/codingagent/tool/WorkspacePathResolver.java), [BashExecTool.java](src/main/java/com/example/codingagent/tool/BashExecTool.java) |
 | 更完整的流式终端 UI / TUI 渲染 | 未对齐 | - |
@@ -97,6 +98,7 @@ printf '/model help\n/model current\n/provider openai\n/model\n/quit\n' | sh ./m
 - `mock`、`openai` 两种 provider，以及配置文件、环境变量、命令行三级 base URL 覆盖
 - provider-aware 默认模型：`mock -> mock-coder`，`openai -> gpt-4.1-mini`
 - 当前 JSON 决策协议已兼容 `toolCall.argument` 和结构化 `toolCall.arguments`
+- 每个工具现在都声明自己的参数契约，prompt 和 `/tools` 会展示 `plain_text/json_object`、字段和示例
 - `list_files`、`read_file`、`grep_text`、`bash_exec`、`write_file`、`patch_file` 六类本地工具
 - `.agent/sessions` 下的 JSONL transcript 持久化、同 `session-id` 历史续跑、会话标题和上下文文件索引
 - `/status`、`/cost`、`/doctor`、`/version` 这类会话内运行时视图

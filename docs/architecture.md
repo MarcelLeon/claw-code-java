@@ -47,6 +47,9 @@
 - `ToolCall`
   - 表示一次工具调用请求
   - 当前同时兼容旧的字符串 `argument` 和结构化 `arguments`
+- `ToolArgumentDescriptor`
+  - 表示工具对外暴露的参数契约
+  - 当前用于同时驱动 prompt 注入和 `/tools` 展示
 - `ToolExecutionResult`
   - 表示工具执行结果
 - `TranscriptEntry`
@@ -217,6 +220,7 @@ flowchart TD
 职责：
 
 - 实现本地可执行能力
+- 暴露工具参数契约
 - 保持工作区边界
 - 统一返回工具结果
 
@@ -224,6 +228,15 @@ flowchart TD
 
 - 多轮对话编排
 - 模型协议解析
+
+当前 `tool` 内部进一步分成两层：
+
+- execution contract
+  - 负责真正执行工具
+  - 如 `WorkspaceTool.execute(...)`
+- argument contract
+  - 负责描述工具的输入格式、字段和示例
+  - 如 `ToolArgumentDescriptor`
 
 ### `persistence`
 

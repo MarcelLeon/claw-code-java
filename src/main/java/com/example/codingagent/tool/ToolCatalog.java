@@ -23,7 +23,7 @@ public class ToolCatalog {
      */
     public List<ToolDescriptor> listTools() {
         return tools.stream()
-                .map(tool -> new ToolDescriptor(tool.name(), tool.description()))
+                .map(tool -> new ToolDescriptor(tool.name(), tool.description(), tool.argumentDescriptor()))
                 .sorted(Comparator.comparing(ToolDescriptor::name))
                 .toList();
     }

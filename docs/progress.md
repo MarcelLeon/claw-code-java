@@ -89,6 +89,7 @@
 - 增加 chat 内的 `/doctor` 与 `/version`，并让 `/exit` 显式支持 `/quit` 别名
 - 增强 `/model` 语义，支持 help/current 参数、text-mode model selection menu，以及 provider-aware 默认模型解析
 - 增强 JSON 决策协议，支持 `toolCall.argument` 与结构化 `toolCall.arguments` 双栈兼容
+- 为工具层增加显式参数契约，prompt 与 `/tools` 都会展示参数格式、字段和示例
 - 抽象 `ChatSessionState`，把交互式会话状态从 REPL 逻辑中分离
 - 建立最小 Agent Loop：`AgentRunnerFacade` -> `CodingAgentEngine`
 - 建立模型路由：`mock`、`openai`
@@ -170,6 +171,7 @@
 - `chat --provider mock --session-id smoke-model-command-3` 下的 `/model help`、`/model current`、`/provider openai`、`/model` CLI 实跑
 - `chat --provider mock --session-id smoke-structured-tools` 下的结构化 `write_file` 工具调用 CLI 实跑
 - `chat --provider mock --session-id smoke-structured-patch-success` 下的结构化 `patch_file` 工具调用 CLI 实跑
+- `chat --provider mock --session-id smoke-tool-schema` 下的 `/tools` schema 展示 CLI 实跑
 - `chat` 会话内 `/provider`、`/base-url` 的查看、切换与恢复默认值测试
 - `java -jar target/coding-agent-cli-0.1.0-SNAPSHOT.jar doctor` 实跑
 - `run --prompt '请读取 README'` CLI 实跑
@@ -192,6 +194,7 @@
 - `chat` 已支持会话级控制：新建会话、切换到已有会话、查看/切换当前 provider、模型和 base URL
 - `/model` 已具备 Claude Code 风格的 help/current/menu 语义，并且 provider 切换后会解析新的默认模型
 - 运行时现在已能同时兼容旧的 `toolCall.argument` 和新的 `toolCall.arguments`，`write_file` / `patch_file` 已经用结构化参数闭环验证
+- 工具层现在不再只是“名字 + 描述”，而是具备显式参数契约；模型 prompt 和 `/tools` 输出都能看到参数格式、字段与示例
 - `chat` 已支持会话标题：可通过 `/rename` 显式设置，也可基于历史首条用户消息生成 kebab-case 标题
 - `chat` 已支持会话上下文文件索引：`read_file`、`write_file`、`patch_file` 命中的文件会登记到会话元数据，`/files` 可列出当前上下文文件
 - `chat` 已支持基础 `/cost` 视图：当前先基于本地 transcript 统计消息数、字符数和工具输出量，尚未接入真实 provider token/billing

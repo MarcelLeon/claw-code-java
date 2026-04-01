@@ -3,8 +3,11 @@ package com.example.codingagent.model;
 import com.example.codingagent.config.AgentProperties;
 import com.example.codingagent.model.protocol.AgentDecisionProtocol;
 import com.example.codingagent.persistence.TranscriptEntry;
+import com.example.codingagent.tool.ToolArgumentDescriptor;
+import com.example.codingagent.tool.ToolArgumentKind;
+import com.example.codingagent.tool.ToolCatalog;
+import com.example.codingagent.tool.ToolDescriptor;
 import com.example.codingagent.tool.ToolExecutionResult;
-import com.example.codingagent.tool.WorkspaceTool;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -23,16 +26,16 @@ import org.springframework.stereotype.Component;
 public class OpenAiDecisionPromptBuilder {
 
     private final AgentProperties agentProperties;
-    private final List<WorkspaceTool> tools;
+    private final ToolCatalog toolCatalog;
     private final AgentDecisionProtocol agentDecisionProtocol;
 
     public OpenAiDecisionPromptBuilder(
             AgentProperties agentProperties,
-            List<WorkspaceTool> tools,
+            ToolCatalog toolCatalog,
             AgentDecisionProtocol agentDecisionProtocol
     ) {
         this.agentProperties = agentProperties;
-        this.tools = tools;
+        this.toolCatalog = toolCatalog;
         this.agentDecisionProtocol = agentDecisionProtocol;
     }
 
@@ -45,10 +48,7 @@ public class OpenAiDecisionPromptBuilder {
     public Prompt build(AgentRequestContext context) {
         List<String> lines = new ArrayList<>(agentProperties.getModel().getPrompt().getSystemLines());
         lines.addAll(agentDecisionProtocol.instructionLines());
-        lines.add("可用工具：");
-        lines.addAll(tools.stream()
-                .map(tool -> "- " + tool.name() + ": " + tool.description())
-                .collect(Collectors.toList()));
+        appendToolSection(lines);
 
         List<String> userLines = new ArrayList<>();
         userLines.add("用户任务：");
@@ -73,6 +73,26 @@ public class OpenAiDecisionPromptBuilder {
                 new SystemMessage(String.join(System.lineSeparator(), lines)),
                 new UserMessage(String.join(System.lineSeparator(), userLines))
         );
+    }
+
+    private void appendToolSection(List<String> lines) {
+        lines.add("可用工具：");
+        for (ToolDescriptor tool : toolCatalog.listTools()) {
+            ToolArgumentDescriptor argumentDescriptor = tool.argumentDescriptor();
+            lines.add("- " + tool.name() + ": " + tool.description());
+            lines.add("  参数格式: " + renderArgumentKind(argumentDescriptor.kind()));
+            if (argumentDescriptor.summary() != null && !argumentDescriptor.summary().isBlank()) {
+                lines.add("  参数摘要: " + argumentDescriptor.summary());
+            }
+            argumentDescriptor.parameters().forEach(parameter -> lines.add("  参数字段: "
+                    + parameter.name()
+                    + " <" + parameter.type() + ">"
+                    + (parameter.required() ? " required" : " optional")
+                    + " - " + parameter.description()));
+            if (argumentDescriptor.example() != null && !argumentDescriptor.example().isBlank()) {
+                lines.add("  参数示例: " + argumentDescriptor.example());
+            }
+        }
     }
 
     private void appendTranscriptSection(List<String> userLines, List<TranscriptEntry> transcriptEntries) {
@@ -130,5 +150,12 @@ public class OpenAiDecisionPromptBuilder {
             return normalized;
         }
         return normalized.substring(0, maxEntryChars) + "...";
+    }
+
+    private String renderArgumentKind(ToolArgumentKind kind) {
+        return switch (kind) {
+            case PLAIN_TEXT -> "plain_text";
+            case JSON_OBJECT -> "json_object";
+        };
     }
 }

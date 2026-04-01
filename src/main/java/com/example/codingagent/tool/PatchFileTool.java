@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,6 +29,20 @@ public class PatchFileTool implements WorkspaceTool {
     @Override
     public String description() {
         return "按精确文本片段修改文件。argument 需为 JSON 字符串，例如：{\"path\":\"src/App.java\",\"findText\":\"old\",\"replaceText\":\"new\",\"expectedMatches\":1}";
+    }
+
+    @Override
+    public ToolArgumentDescriptor argumentDescriptor() {
+        return ToolArgumentDescriptor.jsonObject(
+                "JSON 对象，按精确文本片段修改文件",
+                "{\"path\":\"src/App.java\",\"findText\":\"old\",\"replaceText\":\"new\",\"expectedMatches\":1}",
+                List.of(
+                        new ToolParameterDescriptor("path", "string", true, "工作区内相对文件路径"),
+                        new ToolParameterDescriptor("findText", "string", true, "要匹配的原始文本"),
+                        new ToolParameterDescriptor("replaceText", "string", true, "替换后的文本"),
+                        new ToolParameterDescriptor("expectedMatches", "integer", false, "期望匹配次数，默认 1")
+                )
+        );
     }
 
     @Override

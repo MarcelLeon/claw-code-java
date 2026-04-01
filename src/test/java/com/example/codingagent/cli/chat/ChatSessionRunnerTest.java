@@ -95,6 +95,9 @@ class ChatSessionRunnerTest {
         assertThat(text).contains("Set provider to mock");
         assertThat(text).contains("Set base-url to (default)");
         assertThat(text).contains("- read_file:");
+        assertThat(text).contains("argument-kind: plain_text");
+        assertThat(text).contains("argument-kind: json_object");
+        assertThat(text).contains("field: path <string> required");
         assertThat(text).contains("/provider  查看或切换当前会话 provider");
         assertThat(text).contains("/base-url  查看或切换当前会话 base URL");
         assertThat(text).contains("/cost  查看当前会话的本地成本统计");

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,6 +29,18 @@ public class WriteFileTool implements WorkspaceTool {
     @Override
     public String description() {
         return "写入文本文件。argument 需为 JSON 字符串，例如：{\"path\":\"notes/todo.txt\",\"content\":\"hello\"}";
+    }
+
+    @Override
+    public ToolArgumentDescriptor argumentDescriptor() {
+        return ToolArgumentDescriptor.jsonObject(
+                "JSON 对象，写入文件路径与内容",
+                "{\"path\":\"notes/todo.txt\",\"content\":\"hello\"}",
+                List.of(
+                        new ToolParameterDescriptor("path", "string", true, "工作区内相对文件路径"),
+                        new ToolParameterDescriptor("content", "string", true, "要写入的完整文本内容")
+                )
+        );
     }
 
     @Override

@@ -8,6 +8,8 @@ import com.example.codingagent.persistence.TranscriptEntry;
 import com.example.codingagent.runtime.AgentRuntimeContext;
 import com.example.codingagent.runtime.ConversationState;
 import com.example.codingagent.runtime.AgentSession;
+import com.example.codingagent.tool.ToolArgumentDescriptor;
+import com.example.codingagent.tool.ToolCatalog;
 import com.example.codingagent.tool.ToolExecutionResult;
 import com.example.codingagent.tool.WorkspaceTool;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +31,7 @@ class OpenAiDecisionPromptBuilderTest {
         ));
         OpenAiDecisionPromptBuilder builder = new OpenAiDecisionPromptBuilder(
                 properties,
-                List.of(fakeTool()),
+                new ToolCatalog(List.of(fakeTool())),
                 protocol()
         );
 
@@ -45,6 +47,8 @@ class OpenAiDecisionPromptBuilderTest {
         assertThat(systemText).contains("必须只输出 JSON");
         assertThat(systemText).contains("可用工具：");
         assertThat(systemText).contains("- read_file: 读取文件");
+        assertThat(systemText).contains("参数格式: plain_text");
+        assertThat(systemText).contains("参数示例: README.md");
     }
 
     @Test
@@ -55,7 +59,7 @@ class OpenAiDecisionPromptBuilderTest {
         properties.getRuntime().getTranscript().setMaxEntryChars(24);
         OpenAiDecisionPromptBuilder builder = new OpenAiDecisionPromptBuilder(
                 properties,
-                List.of(fakeTool()),
+                new ToolCatalog(List.of(fakeTool())),
                 protocol()
         );
 
@@ -93,7 +97,7 @@ class OpenAiDecisionPromptBuilderTest {
         properties.getRuntime().getTranscript().setRecentEntries(10);
         OpenAiDecisionPromptBuilder builder = new OpenAiDecisionPromptBuilder(
                 properties,
-                List.of(fakeTool()),
+                new ToolCatalog(List.of(fakeTool())),
                 protocol()
         );
 
@@ -136,6 +140,11 @@ class OpenAiDecisionPromptBuilderTest {
             @Override
             public String description() {
                 return "读取文件";
+            }
+
+            @Override
+            public ToolArgumentDescriptor argumentDescriptor() {
+                return ToolArgumentDescriptor.plainText("相对文件路径", "README.md");
             }
 
             @Override

@@ -23,6 +23,11 @@ public class ReadFileTool implements WorkspaceTool {
     }
 
     @Override
+    public ToolArgumentDescriptor argumentDescriptor() {
+        return ToolArgumentDescriptor.plainText("工作区内的相对文件路径", "README.md");
+    }
+
+    @Override
     public ToolExecutionResult execute(AgentRuntimeContext context, String argument) {
         try {
             Path target = WorkspacePathResolver.resolve(context, argument);

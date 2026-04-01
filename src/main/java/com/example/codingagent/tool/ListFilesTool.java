@@ -24,6 +24,11 @@ public class ListFilesTool implements WorkspaceTool {
     }
 
     @Override
+    public ToolArgumentDescriptor argumentDescriptor() {
+        return ToolArgumentDescriptor.plainText("工作区内的相对目录路径", ".");
+    }
+
+    @Override
     public ToolExecutionResult execute(AgentRuntimeContext context, String argument) {
         try {
             Path target = WorkspacePathResolver.resolve(context, argument);
