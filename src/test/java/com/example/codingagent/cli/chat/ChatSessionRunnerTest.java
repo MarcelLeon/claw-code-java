@@ -91,7 +91,8 @@ class ChatSessionRunnerTest {
         assertThat(text).contains("/help  查看可用 slash commands");
         assertThat(text).contains("未知命令: /unknown");
         assertThat(text).contains("已执行工具 `read_file`");
-        assertThat(text).contains("- README.md");
+        assertThat(text).contains("Files in context:");
+        assertThat(text).contains("README.md");
         assertThat(text).contains("Recent conversations:");
         assertThat(text).contains("Started a new conversation.");
         assertThat(text).contains("Set model to gpt-4.1-mini");

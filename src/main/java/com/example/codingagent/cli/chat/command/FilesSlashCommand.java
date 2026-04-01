@@ -32,9 +32,9 @@ public class FilesSlashCommand implements ChatSlashCommand {
         if (files.isEmpty()) {
             return ChatSlashCommandResult.output(List.of("No files in context"));
         }
-        List<String> lines = files.stream()
-                .map(path -> "- " + path)
-                .toList();
-        return ChatSlashCommandResult.output(lines);
+        return ChatSlashCommandResult.output(List.of(
+                "Files in context:",
+                String.join(System.lineSeparator(), files)
+        ));
     }
 }
