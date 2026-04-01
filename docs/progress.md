@@ -82,6 +82,7 @@
 - 增强 chat 会话控制，支持 `/clear`、`/resume`、`/model`
 - 补齐 chat 会话运行时覆盖控制，支持在 REPL 内查看/切换 `/provider`、`/base-url`
 - 增加 `/rename`，并抽象独立会话元数据存储，支持显示自定义标题
+- 增加 `/files`，并抽象会话级上下文文件索引，跟踪进入上下文的文件
 - 抽象 `ChatSessionState`，把交互式会话状态从 REPL 逻辑中分离
 - 建立最小 Agent Loop：`AgentRunnerFacade` -> `CodingAgentEngine`
 - 建立模型路由：`mock`、`openai`
@@ -105,6 +106,7 @@
 - 阶段一：已完成并通过测试
 - 阶段二：已完成“真实模型接入骨架”、`openai` provider 路由、base URL 覆盖链路、基础会话续跑、transcript 压缩窗口、可配置 system prompt 组装，以及工作区内安全文件修改能力；chat 会话内的 provider / model / base URL 覆盖也已打通，正在继续增强工具协议和恢复能力
 - 当前增量重点：围绕 Claude Code 的默认 chat 体验继续补足会话命令面，最新已补 `/rename` 与会话标题展示
+- 当前增量重点：继续补足 Claude Code 风格的会话命令面，最新已补 `/rename`、`/files` 与会话级上下文文件索引
 
 ## 5. 当前代码地图
 
@@ -154,6 +156,7 @@
 - `chat --provider mock --session-id demo-chat-slash` 下的 `/status`、`/tools`、`/help`、`/exit` CLI 实跑
 - `chat --provider mock --session-id demo-live-session` 下的 `/resume`、`/clear`、`/model` CLI 实跑
 - `chat --provider mock --session-id smoke-rename-*` 下的 `/rename`、标题生成与 `/resume` 标题展示 CLI 实跑
+- `chat --provider mock --session-id smoke-files-*` 下的 `/files` 前后状态与上下文文件登记 CLI 实跑
 - `chat` 会话内 `/provider`、`/base-url` 的查看、切换与恢复默认值测试
 - `java -jar target/coding-agent-cli-0.1.0-SNAPSHOT.jar doctor` 实跑
 - `run --prompt '请读取 README'` CLI 实跑
@@ -175,6 +178,7 @@
 - root 默认入口已不再只是帮助页，而是直接落到默认 chat，会话式体验更贴近 Claude Code
 - `chat` 已支持会话级控制：新建会话、切换到已有会话、查看/切换当前 provider、模型和 base URL
 - `chat` 已支持会话标题：可通过 `/rename` 显式设置，也可基于历史首条用户消息生成 kebab-case 标题
+- `chat` 已支持会话上下文文件索引：`read_file`、`write_file`、`patch_file` 命中的文件会登记到会话元数据，`/files` 可列出当前上下文文件
 - 工具执行结果已能反馈回下一轮模型决策
 - 读、搜、执行命令、写文件四类基础动作均已闭环验证
 - `bash_exec` 已具备基础安全护栏，可拦截典型危险命令并限制执行时长
@@ -202,6 +206,7 @@
 - 把当前基于正则的 `bash_exec` 安全策略扩展为更明确的权限模式、白名单和审计
 - 增加阶段性架构文档，方便继续魔改
 - 继续补足 Claude Code 风格的 session / status / cost / files 命令面
+- 把上下文文件索引继续从“已触达文件”提升为“更接近真实上下文缓存”的表示
 
 ## 8. 接手说明
 

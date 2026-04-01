@@ -12,9 +12,11 @@ import org.springframework.stereotype.Component;
 public class ToolExecutor {
 
     private final List<WorkspaceTool> tools;
+    private final ToolContextFileTracker toolContextFileTracker;
 
-    public ToolExecutor(List<WorkspaceTool> tools) {
+    public ToolExecutor(List<WorkspaceTool> tools, ToolContextFileTracker toolContextFileTracker) {
         this.tools = tools;
+        this.toolContextFileTracker = toolContextFileTracker;
     }
 
     /**
@@ -29,6 +31,8 @@ public class ToolExecutor {
                 .filter(tool -> tool.supports(toolCall.toolName()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("不支持的工具: " + toolCall.toolName()));
-        return matchedTool.execute(context, toolCall.argument());
+        ToolExecutionResult result = matchedTool.execute(context, toolCall.argument());
+        toolContextFileTracker.track(context, toolCall, result);
+        return result;
     }
 }

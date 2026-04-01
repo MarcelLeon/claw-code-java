@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,10 +32,12 @@ public class SessionMetadataStore {
     public SessionMetadata load(AgentSession session) {
         Path metadataPath = metadataPath(session);
         if (!Files.exists(metadataPath)) {
-            return new SessionMetadata(null);
+            return new SessionMetadata(null, List.of());
         }
         try {
-            return objectMapper.readValue(metadataPath.toFile(), SessionMetadata.class);
+            SessionMetadata metadata = objectMapper.readValue(metadataPath.toFile(), SessionMetadata.class);
+            List<String> contextFiles = metadata.contextFiles() == null ? List.of() : metadata.contextFiles();
+            return new SessionMetadata(metadata.customTitle(), contextFiles);
         } catch (IOException ex) {
             throw new IllegalStateException("读取会话元数据失败: " + metadataPath, ex);
         }
@@ -47,12 +50,28 @@ public class SessionMetadataStore {
      * @param customTitle 自定义标题
      */
     public void saveCustomTitle(AgentSession session, String customTitle) {
+        SessionMetadata existing = load(session);
+        save(session, new SessionMetadata(customTitle, existing.contextFiles()));
+    }
+
+    /**
+     * 写入上下文文件集合。
+     *
+     * @param session 会话
+     * @param contextFiles 上下文文件
+     */
+    public void saveContextFiles(AgentSession session, List<String> contextFiles) {
+        SessionMetadata existing = load(session);
+        save(session, new SessionMetadata(existing.customTitle(), contextFiles));
+    }
+
+    private void save(AgentSession session, SessionMetadata metadata) {
         Path metadataPath = metadataPath(session);
         try {
             Files.createDirectories(metadataPath.getParent());
             Files.writeString(
                     metadataPath,
-                    objectMapper.writeValueAsString(new SessionMetadata(customTitle)),
+                    objectMapper.writeValueAsString(metadata),
                     StandardCharsets.UTF_8
             );
         } catch (IOException ex) {

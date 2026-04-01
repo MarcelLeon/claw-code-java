@@ -10,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
@@ -101,6 +102,36 @@ public class SessionService {
     public String generateSessionTitle(String sessionId) {
         List<TranscriptEntry> entries = transcriptStore.loadTranscript(openSession(sessionId));
         return sessionTitleGenerator.generate(entries);
+    }
+
+    /**
+     * 向会话上下文文件集合中登记文件。
+     *
+     * @param sessionId 会话 ID
+     * @param relativePath 工作区相对路径
+     */
+    public void addContextFile(String sessionId, String relativePath) {
+        if (relativePath == null || relativePath.isBlank()) {
+            return;
+        }
+        AgentSession session = openSession(sessionId);
+        SessionMetadata metadata = sessionMetadataStore.load(session);
+        List<String> contextFiles = new ArrayList<>(metadata.contextFiles());
+        if (!contextFiles.contains(relativePath)) {
+            contextFiles.add(relativePath);
+            contextFiles.sort(String::compareTo);
+            sessionMetadataStore.saveContextFiles(session, contextFiles);
+        }
+    }
+
+    /**
+     * 列出当前会话进入上下文的文件。
+     *
+     * @param sessionId 会话 ID
+     * @return 相对路径列表
+     */
+    public List<String> listContextFiles(String sessionId) {
+        return sessionMetadataStore.load(openSession(sessionId)).contextFiles();
     }
 
     /**

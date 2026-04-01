@@ -26,6 +26,7 @@ class ChatSessionRunnerTest {
         String sessionId = "chat-session-test-" + UUID.randomUUID();
         ByteArrayInputStream input = new ByteArrayInputStream((
                 "/status\n"
+                        + "/files\n"
                         + "/rename\n"
                         + "/provider\n"
                         + "/provider openai\n"
@@ -37,6 +38,7 @@ class ChatSessionRunnerTest {
                         + "/help\n"
                         + "/unknown\n"
                         + "请读取 README\n"
+                        + "/files\n"
                         + "/resume\n"
                         + "/clear\n"
                         + "/model gpt-4.1-mini\n"
@@ -62,6 +64,7 @@ class ChatSessionRunnerTest {
         String text = output.toString(StandardCharsets.UTF_8);
         assertThat(text).contains("session: " + sessionId);
         assertThat(text).contains("title: (untitled)");
+        assertThat(text).contains("No files in context");
         assertThat(text).contains("Could not generate a name: no conversation context yet. Usage: /rename <name>");
         assertThat(text).contains("provider: mock");
         assertThat(text).contains("Current provider: mock");
@@ -76,6 +79,7 @@ class ChatSessionRunnerTest {
         assertThat(text).contains("/help  查看可用 slash commands");
         assertThat(text).contains("未知命令: /unknown");
         assertThat(text).contains("已执行工具 `read_file`");
+        assertThat(text).contains("- README.md");
         assertThat(text).contains("Recent conversations:");
         assertThat(text).contains("Started a new conversation.");
         assertThat(text).contains("Set model to gpt-4.1-mini");
