@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: coding-agent-cli
+  main:
+    web-application-type: none
+  autoconfigure:
+    exclude:
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiAudioSpeechAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiAudioTranscriptionAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiChatAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiEmbeddingAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiImageAutoConfiguration
+      - org.springframework.ai.model.openai.autoconfigure.OpenAiModerationAutoConfiguration
+
+agent:
+  runtime:
+    workspace-root: .
+    sessions-dir: .agent/sessions
+    max-turns: 8
+    transcript:
+      recent-entries: 8
+      summary-entries: 4
+      max-entry-chars: 160
+  tool:
+    bash-exec:
+      timeout-seconds: 20
+      blocked-command-patterns:
+        - "(^|\\s)rm\\s+-rf(\\s|$)"
+        - "(^|\\s)sudo\\s+rm\\s+-rf(\\s|$)"
+        - "(^|\\s)shutdown(\\s|$)"
+        - "(^|\\s)reboot(\\s|$)"
+        - "(^|\\s)mkfs(\\.[^\\s]+)?(\\s|$)"
+  model:
+    provider: mock
+    model: mock-coder
+    base-url: https://api.openai.com
+    temperature: 0.2
+    prompt:
+      system-lines:
+        - "你是一个 Java-first Coding Agent CLI 的决策器。"
+        - "你的职责是在本地工作区内选择下一步：直接回答，或调用一个工具。"
+        - "必须只输出 JSON，不要输出 Markdown、解释或代码块。"
+        - "JSON 结构固定如下："
+        - "{\"summary\":\"一句话总结当前动作\",\"finalAnswer\":\"最终回答，若需调用工具则填 null\",\"toolCall\":{\"toolName\":\"工具名\",\"argument\":\"字符串参数\"}}"
+        - "规则："
+        - "1. 如果已经拿到足够的工具结果，优先输出 finalAnswer，并将 toolCall 设为 null。"
+        - "2. 如果需要查看更多上下文，只能选择一个工具。"
+        - "3. toolCall.argument 必须是单个字符串。"
+        - "4. 所有路径都使用相对工作区路径。"
