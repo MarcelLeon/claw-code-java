@@ -85,6 +85,10 @@ flowchart TD
   - 负责按名称/别名分发 slash command
 - `SessionService`
   - 负责统一管理 transcript 与会话元数据
+- `DoctorSummaryService`
+  - 负责统一汇总运行环境诊断信息
+- `StatusSummaryService`
+  - 负责统一汇总会话状态和版本信息
 
 它们与 runtime 的关系是：
 
@@ -92,7 +96,7 @@ flowchart TD
 flowchart TD
     A["ChatSessionRunner"] --> B["ChatSessionState"]
     A --> C["ChatSlashCommandDispatcher"]
-    C --> D["/status /tools /files /cost /help /exit"]
+    C --> D["/status /tools /files /cost /doctor /version /help /exit"]
     C --> E["/clear /resume /rename /model /provider /base-url"]
     A --> F["AgentRunnerFacade"]
     B --> F

@@ -26,6 +26,8 @@ class ChatSessionRunnerTest {
         String sessionId = "chat-session-test-" + UUID.randomUUID();
         ByteArrayInputStream input = new ByteArrayInputStream((
                 "/status\n"
+                        + "/version\n"
+                        + "/doctor\n"
                         + "/cost\n"
                         + "/files\n"
                         + "/rename\n"
@@ -54,7 +56,7 @@ class ChatSessionRunnerTest {
                         + "/resume " + sessionId + "\n"
                         + "/cost\n"
                         + "请根据历史继续\n"
-                        + "/exit\n"
+                        + "/quit\n"
         ).getBytes(StandardCharsets.UTF_8));
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
@@ -68,6 +70,9 @@ class ChatSessionRunnerTest {
         assertThat(text).contains("app: coding-agent-cli");
         assertThat(text).contains("workspace: ");
         assertThat(text).contains("session: " + sessionId);
+        assertThat(text).contains("0.1.0-SNAPSHOT");
+        assertThat(text).contains("Java version: ");
+        assertThat(text).contains("resolved-base-url: https://api.openai.com");
         assertThat(text).contains("title: (untitled)");
         assertThat(text).contains("api-key: not configured");
         assertThat(text).contains("connectivity: not checked (run doctor to verify)");
@@ -88,7 +93,10 @@ class ChatSessionRunnerTest {
         assertThat(text).contains("/provider  查看或切换当前会话 provider");
         assertThat(text).contains("/base-url  查看或切换当前会话 base URL");
         assertThat(text).contains("/cost  查看当前会话的本地成本统计");
+        assertThat(text).contains("/doctor  诊断当前运行环境");
         assertThat(text).contains("/help  查看可用 slash commands");
+        assertThat(text).contains("/version  查看当前会话运行版本");
+        assertThat(text).contains("/exit  结束当前 chat 会话 (aliases: quit)");
         assertThat(text).contains("未知命令: /unknown");
         assertThat(text).contains("已执行工具 `read_file`");
         assertThat(text).contains("Files in context:");

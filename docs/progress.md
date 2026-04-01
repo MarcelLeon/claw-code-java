@@ -86,6 +86,7 @@
 - 增加 `/cost`，基于本地 transcript 输出会话消息量、字符量和上下文文件统计
 - 增强 `/status`，抽象独立状态摘要服务，输出版本、工作区、配置与本地会话上下文概况
 - 为 transcript 记录增加时间戳，并让 `/cost` 输出本地持续时间统计，同时兼容旧 JSONL
+- 增加 chat 内的 `/doctor` 与 `/version`，并让 `/exit` 显式支持 `/quit` 别名
 - 抽象 `ChatSessionState`，把交互式会话状态从 REPL 逻辑中分离
 - 建立最小 Agent Loop：`AgentRunnerFacade` -> `CodingAgentEngine`
 - 建立模型路由：`mock`、`openai`
@@ -108,7 +109,7 @@
 
 - 阶段一：已完成并通过测试
 - 阶段二：已完成“真实模型接入骨架”、`openai` provider 路由、base URL 覆盖链路、基础会话续跑、transcript 压缩窗口、可配置 system prompt 组装，以及工作区内安全文件修改能力；chat 会话内的 provider / model / base URL 覆盖也已打通，正在继续增强工具协议和恢复能力
-- 当前增量重点：继续补足 Claude Code 风格的会话命令面，最新已补 `/rename`、`/files`、`/cost`，并增强 `/status`
+- 当前增量重点：继续补足 Claude Code 风格的会话命令面，最新已补 `/rename`、`/files`、`/cost`、`/doctor`、`/version`，并增强 `/status`
 
 ## 5. 当前代码地图
 
@@ -162,6 +163,7 @@
 - `chat --provider mock --session-id smoke-cost-*` 下的 `/cost` 会话统计 CLI 实跑
 - `chat --provider mock --session-id smoke-status-*` 下的 `/status` 扩展状态视图 CLI 实跑
 - `chat --provider mock --session-id smoke-duration-*` 下的 `/cost` 持续时间统计 CLI 实跑
+- `chat --provider mock --session-id smoke-doctor-version` 下的 `/doctor`、`/version`、`/quit` CLI 实跑
 - `chat` 会话内 `/provider`、`/base-url` 的查看、切换与恢复默认值测试
 - `java -jar target/coding-agent-cli-0.1.0-SNAPSHOT.jar doctor` 实跑
 - `run --prompt '请读取 README'` CLI 实跑
@@ -187,6 +189,7 @@
 - `chat` 已支持基础 `/cost` 视图：当前先基于本地 transcript 统计消息数、字符数和工具输出量，尚未接入真实 provider token/billing
 - `chat` 的 `/cost` 已支持本地持续时间统计；新会话会写入 transcript 时间戳，旧 JSONL 会降级显示 duration unavailable
 - `chat` 的 `/status` 已不再只是会话 ID/模型覆盖值，而是统一展示应用版本、工作区、配置状态、工具数量与上下文文件概况
+- `chat` 现在已具备 `/doctor` 与 `/version` 这类“运行时自诊断命令”，更接近 Claude Code 那种把环境检查和会话命令统一收敛到 REPL 中的体验
 - 工具执行结果已能反馈回下一轮模型决策
 - 读、搜、执行命令、写文件四类基础动作均已闭环验证
 - `bash_exec` 已具备基础安全护栏，可拦截典型危险命令并限制执行时长

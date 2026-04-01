@@ -47,7 +47,7 @@ public class StatusSummaryService {
     ) {
         return new SessionStatusSummary(
                 applicationName,
-                resolveVersion(),
+                currentVersion(),
                 sessionService.workspaceRoot(),
                 sessionId,
                 sessionService.getCustomTitle(sessionId),
@@ -61,7 +61,12 @@ public class StatusSummaryService {
         );
     }
 
-    private String resolveVersion() {
+    /**
+     * 返回当前运行版本。
+     *
+     * @return 版本号
+     */
+    public String currentVersion() {
         Package sourcePackage = StatusSummaryService.class.getPackage();
         if (sourcePackage != null && sourcePackage.getImplementationVersion() != null) {
             return sourcePackage.getImplementationVersion();

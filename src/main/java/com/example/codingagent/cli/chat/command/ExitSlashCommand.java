@@ -15,6 +15,11 @@ public class ExitSlashCommand implements ChatSlashCommand {
     }
 
     @Override
+    public java.util.List<String> aliases() {
+        return java.util.List.of("quit");
+    }
+
+    @Override
     public String description() {
         return "结束当前 chat 会话";
     }
