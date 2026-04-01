@@ -116,34 +116,34 @@
 建议按下面顺序阅读：
 
 1. 启动入口
-   - [CodingAgentApplication.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/CodingAgentApplication.java)
-   - [CodingAgentCliCommand.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/cli/CodingAgentCliCommand.java)
-   - [architecture.md](/Users/wangzq/VsCodeProjects/claude-code/docs/architecture.md)
+   - [CodingAgentApplication.java](../src/main/java/com/example/codingagent/CodingAgentApplication.java)
+   - [CodingAgentCliCommand.java](../src/main/java/com/example/codingagent/cli/CodingAgentCliCommand.java)
+   - [architecture.md](architecture.md)
 2. CLI 命令
-   - [RootCommand.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/cli/RootCommand.java)
-   - [DoctorCommand.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/cli/command/DoctorCommand.java)
-   - [ChatCommand.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/cli/command/ChatCommand.java)
-   - [RunCommand.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/cli/command/RunCommand.java)
-   - [ChatSessionRunner.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/cli/chat/ChatSessionRunner.java)
+   - [RootCommand.java](../src/main/java/com/example/codingagent/cli/RootCommand.java)
+   - [DoctorCommand.java](../src/main/java/com/example/codingagent/cli/command/DoctorCommand.java)
+   - [ChatCommand.java](../src/main/java/com/example/codingagent/cli/command/ChatCommand.java)
+   - [RunCommand.java](../src/main/java/com/example/codingagent/cli/command/RunCommand.java)
+   - [ChatSessionRunner.java](../src/main/java/com/example/codingagent/cli/chat/ChatSessionRunner.java)
    - `cli/chat/command/*`
 3. 运行时主链路
-   - [AgentRunnerFacade.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/runtime/AgentRunnerFacade.java)
-   - [CodingAgentEngine.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/runtime/CodingAgentEngine.java)
-   - [AgentRuntimeFactory.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/runtime/AgentRuntimeFactory.java)
+   - [AgentRunnerFacade.java](../src/main/java/com/example/codingagent/runtime/AgentRunnerFacade.java)
+   - [CodingAgentEngine.java](../src/main/java/com/example/codingagent/runtime/CodingAgentEngine.java)
+   - [AgentRuntimeFactory.java](../src/main/java/com/example/codingagent/runtime/AgentRuntimeFactory.java)
 4. 模型层
-   - [RoutingAgentModelGateway.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/model/RoutingAgentModelGateway.java)
-   - [MockAgentModelGateway.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/model/MockAgentModelGateway.java)
-   - [OpenAiAgentModelGateway.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/model/OpenAiAgentModelGateway.java)
-   - [OpenAiDecisionPromptBuilder.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/model/OpenAiDecisionPromptBuilder.java)
+   - [RoutingAgentModelGateway.java](../src/main/java/com/example/codingagent/model/RoutingAgentModelGateway.java)
+   - [MockAgentModelGateway.java](../src/main/java/com/example/codingagent/model/MockAgentModelGateway.java)
+   - [OpenAiAgentModelGateway.java](../src/main/java/com/example/codingagent/model/OpenAiAgentModelGateway.java)
+   - [OpenAiDecisionPromptBuilder.java](../src/main/java/com/example/codingagent/model/OpenAiDecisionPromptBuilder.java)
    - `model/protocol/*`
 5. 工具层
-   - [WorkspaceTool.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/tool/WorkspaceTool.java)
-   - [ToolExecutor.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/tool/ToolExecutor.java)
-   - [BashExecTool.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/tool/BashExecTool.java)
+   - [WorkspaceTool.java](../src/main/java/com/example/codingagent/tool/WorkspaceTool.java)
+   - [ToolExecutor.java](../src/main/java/com/example/codingagent/tool/ToolExecutor.java)
+   - [BashExecTool.java](../src/main/java/com/example/codingagent/tool/BashExecTool.java)
 6. 持久化与测试
-   - [TranscriptStore.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/persistence/TranscriptStore.java)
-   - [SessionMetadataStore.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/persistence/SessionMetadataStore.java)
-   - [CodingAgentEngineTest.java](/Users/wangzq/VsCodeProjects/claude-code/src/test/java/com/example/codingagent/runtime/CodingAgentEngineTest.java)
+   - [TranscriptStore.java](../src/main/java/com/example/codingagent/persistence/TranscriptStore.java)
+   - [SessionMetadataStore.java](../src/main/java/com/example/codingagent/persistence/SessionMetadataStore.java)
+   - [CodingAgentEngineTest.java](../src/test/java/com/example/codingagent/runtime/CodingAgentEngineTest.java)
 
 ## 6. 已验证结果
 
