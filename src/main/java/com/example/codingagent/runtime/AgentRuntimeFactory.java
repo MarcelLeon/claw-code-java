@@ -1,6 +1,7 @@
 package com.example.codingagent.runtime;
 
 import com.example.codingagent.config.AgentProperties;
+import com.example.codingagent.model.ModelSettingService;
 import com.example.codingagent.model.OpenAiConfigurationResolver;
 import java.nio.file.Path;
 import org.springframework.stereotype.Component;
@@ -13,13 +14,16 @@ public class AgentRuntimeFactory {
 
     private final AgentProperties agentProperties;
     private final OpenAiConfigurationResolver openAiConfigurationResolver;
+    private final ModelSettingService modelSettingService;
 
     public AgentRuntimeFactory(
             AgentProperties agentProperties,
-            OpenAiConfigurationResolver openAiConfigurationResolver
+            OpenAiConfigurationResolver openAiConfigurationResolver,
+            ModelSettingService modelSettingService
     ) {
         this.agentProperties = agentProperties;
         this.openAiConfigurationResolver = openAiConfigurationResolver;
+        this.modelSettingService = modelSettingService;
     }
 
     /**
@@ -33,9 +37,7 @@ public class AgentRuntimeFactory {
         String provider = request.providerOverride() == null || request.providerOverride().isBlank()
                 ? agentProperties.getModel().getProvider()
                 : request.providerOverride();
-        String model = request.modelOverride() == null || request.modelOverride().isBlank()
-                ? agentProperties.getModel().getModel()
-                : request.modelOverride();
+        String model = modelSettingService.resolveRuntimeModel(provider, request.modelOverride());
         String baseUrl = openAiConfigurationResolver.resolveBaseUrl(request.baseUrlOverride());
         return new AgentRuntimeContext(
                 Path.of(agentProperties.getRuntime().getWorkspaceRoot()).toAbsolutePath().normalize(),

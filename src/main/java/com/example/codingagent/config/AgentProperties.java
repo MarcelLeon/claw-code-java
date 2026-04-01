@@ -2,7 +2,9 @@ package com.example.codingagent.config;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
@@ -130,6 +132,10 @@ public class AgentProperties {
 
         private Double temperature = 0.2D;
 
+        private final Map<String, String> providerDefaults = createProviderDefaults();
+
+        private final Map<String, List<String>> providerPresets = createProviderPresets();
+
         private final Prompt prompt = new Prompt();
 
         public String getProvider() {
@@ -172,8 +178,40 @@ public class AgentProperties {
             this.temperature = temperature;
         }
 
+        /**
+         * 返回按 provider 划分的默认模型设置。
+         *
+         * @return provider 到默认模型的映射
+         */
+        public Map<String, String> getProviderDefaults() {
+            return providerDefaults;
+        }
+
+        /**
+         * 返回按 provider 划分的推荐模型列表。
+         *
+         * @return provider 到推荐模型列表的映射
+         */
+        public Map<String, List<String>> getProviderPresets() {
+            return providerPresets;
+        }
+
         public Prompt getPrompt() {
             return prompt;
+        }
+
+        private Map<String, String> createProviderDefaults() {
+            Map<String, String> defaults = new LinkedHashMap<>();
+            defaults.put("mock", "mock-coder");
+            defaults.put("openai", "gpt-4.1-mini");
+            return defaults;
+        }
+
+        private Map<String, List<String>> createProviderPresets() {
+            Map<String, List<String>> presets = new LinkedHashMap<>();
+            presets.put("mock", List.of("mock-coder"));
+            presets.put("openai", List.of("gpt-4.1-mini", "gpt-4.1"));
+            return presets;
         }
     }
 

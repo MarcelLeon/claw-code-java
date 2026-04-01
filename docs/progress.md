@@ -87,6 +87,7 @@
 - 增强 `/status`，抽象独立状态摘要服务，输出版本、工作区、配置与本地会话上下文概况
 - 为 transcript 记录增加时间戳，并让 `/cost` 输出本地持续时间统计，同时兼容旧 JSONL
 - 增加 chat 内的 `/doctor` 与 `/version`，并让 `/exit` 显式支持 `/quit` 别名
+- 增强 `/model` 语义，支持 help/current 参数、text-mode model selection menu，以及 provider-aware 默认模型解析
 - 抽象 `ChatSessionState`，把交互式会话状态从 REPL 逻辑中分离
 - 建立最小 Agent Loop：`AgentRunnerFacade` -> `CodingAgentEngine`
 - 建立模型路由：`mock`、`openai`
@@ -109,7 +110,7 @@
 
 - 阶段一：已完成并通过测试
 - 阶段二：已完成“真实模型接入骨架”、`openai` provider 路由、base URL 覆盖链路、基础会话续跑、transcript 压缩窗口、可配置 system prompt 组装，以及工作区内安全文件修改能力；chat 会话内的 provider / model / base URL 覆盖也已打通，正在继续增强工具协议和恢复能力
-- 当前增量重点：继续补足 Claude Code 风格的会话命令面，最新已补 `/rename`、`/files`、`/cost`、`/doctor`、`/version`，并增强 `/status`
+- 当前增量重点：继续补足 Claude Code 风格的会话命令面，最新已补 `/rename`、`/files`、`/cost`、`/doctor`、`/version`，增强 `/status`，并细化 `/model` 语义和 provider-aware 默认模型
 
 ## 5. 当前代码地图
 
@@ -134,6 +135,7 @@
    - [RoutingAgentModelGateway.java](../src/main/java/com/example/codingagent/model/RoutingAgentModelGateway.java)
    - [MockAgentModelGateway.java](../src/main/java/com/example/codingagent/model/MockAgentModelGateway.java)
    - [OpenAiAgentModelGateway.java](../src/main/java/com/example/codingagent/model/OpenAiAgentModelGateway.java)
+   - [ModelSettingService.java](../src/main/java/com/example/codingagent/model/ModelSettingService.java)
    - [OpenAiDecisionPromptBuilder.java](../src/main/java/com/example/codingagent/model/OpenAiDecisionPromptBuilder.java)
    - `model/protocol/*`
 5. 工具层
@@ -164,6 +166,7 @@
 - `chat --provider mock --session-id smoke-status-*` 下的 `/status` 扩展状态视图 CLI 实跑
 - `chat --provider mock --session-id smoke-duration-*` 下的 `/cost` 持续时间统计 CLI 实跑
 - `chat --provider mock --session-id smoke-doctor-version` 下的 `/doctor`、`/version`、`/quit` CLI 实跑
+- `chat --provider mock --session-id smoke-model-command-3` 下的 `/model help`、`/model current`、`/provider openai`、`/model` CLI 实跑
 - `chat` 会话内 `/provider`、`/base-url` 的查看、切换与恢复默认值测试
 - `java -jar target/coding-agent-cli-0.1.0-SNAPSHOT.jar doctor` 实跑
 - `run --prompt '请读取 README'` CLI 实跑
@@ -184,6 +187,7 @@
 - `chat` 的会话控制命令已被抽象为独立模块，而不是散落在 REPL 循环中的条件分支
 - root 默认入口已不再只是帮助页，而是直接落到默认 chat，会话式体验更贴近 Claude Code
 - `chat` 已支持会话级控制：新建会话、切换到已有会话、查看/切换当前 provider、模型和 base URL
+- `/model` 已具备 Claude Code 风格的 help/current/menu 语义，并且 provider 切换后会解析新的默认模型
 - `chat` 已支持会话标题：可通过 `/rename` 显式设置，也可基于历史首条用户消息生成 kebab-case 标题
 - `chat` 已支持会话上下文文件索引：`read_file`、`write_file`、`patch_file` 命中的文件会登记到会话元数据，`/files` 可列出当前上下文文件
 - `chat` 已支持基础 `/cost` 视图：当前先基于本地 transcript 统计消息数、字符数和工具输出量，尚未接入真实 provider token/billing

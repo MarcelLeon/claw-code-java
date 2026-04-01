@@ -35,6 +35,15 @@ agent:
     model: mock-coder
     base-url: https://api.openai.com
     temperature: 0.2
+    provider-defaults:
+      mock: mock-coder
+      openai: gpt-4.1-mini
+    provider-presets:
+      mock:
+        - mock-coder
+      openai:
+        - gpt-4.1-mini
+        - gpt-4.1
     prompt:
       system-lines:
         - "你是一个 Java-first Coding Agent CLI 的决策器。"

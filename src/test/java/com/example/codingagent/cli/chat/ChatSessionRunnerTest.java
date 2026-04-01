@@ -44,7 +44,12 @@ class ChatSessionRunnerTest {
                         + "/files\n"
                         + "/resume\n"
                         + "/clear\n"
+                        + "/model help\n"
+                        + "/model current\n"
                         + "/model gpt-4.1-mini\n"
+                        + "/model\n"
+                        + "/provider openai\n"
+                        + "/model current\n"
                         + "/model\n"
                         + "/rename focused-java-agent\n"
                         + "/provider\n"
@@ -103,14 +108,22 @@ class ChatSessionRunnerTest {
         assertThat(text).contains("README.md");
         assertThat(text).contains("Recent conversations:");
         assertThat(text).contains("Started a new conversation.");
+        assertThat(text).contains("Run /model to open the model selection menu, or /model [modelName] to set the model.");
+        assertThat(text).contains("Current model: mock-coder (default)");
         assertThat(text).contains("Set model to gpt-4.1-mini");
+        assertThat(text).contains("Model selection menu (text mode):");
         assertThat(text).contains("Current model: gpt-4.1-mini");
+        assertThat(text).contains("Default model for provider openai: gpt-4.1-mini");
+        assertThat(text).contains("Preset models:");
+        assertThat(text).contains("- mock-coder");
+        assertThat(text).contains("- gpt-4.1-mini");
+        assertThat(text).contains("- gpt-4.1");
         assertThat(text).contains("Session renamed to: focused-java-agent");
-        assertThat(text).contains("Current provider: mock");
+        assertThat(text).contains("Current provider: openai");
         assertThat(text).contains("Current base-url: (default)");
         assertThat(text).contains("title: focused-java-agent");
         assertThat(text).contains("model: gpt-4.1-mini");
-        assertThat(text).contains("provider: mock");
+        assertThat(text).contains("provider: openai");
         assertThat(text).contains("base-url: (default)");
         assertThat(text).contains("context-files: 1");
         assertThat(text).contains("duration: ");

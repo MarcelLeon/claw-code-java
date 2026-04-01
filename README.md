@@ -33,7 +33,7 @@
 | Transcript 持久化与会话续跑 | 已对齐 | [TranscriptStore.java](src/main/java/com/example/codingagent/persistence/TranscriptStore.java), [SessionService.java](src/main/java/com/example/codingagent/runtime/SessionService.java) |
 | 会话标题与上下文文件索引 | 已对齐 | [SessionMetadataStore.java](src/main/java/com/example/codingagent/persistence/SessionMetadataStore.java), [RenameSlashCommand.java](src/main/java/com/example/codingagent/cli/chat/command/RenameSlashCommand.java), [FilesSlashCommand.java](src/main/java/com/example/codingagent/cli/chat/command/FilesSlashCommand.java) |
 | `status` / `cost` / `doctor` / `version` 会话视图 | 已对齐 | [StatusSummaryService.java](src/main/java/com/example/codingagent/runtime/StatusSummaryService.java), [CostSlashCommand.java](src/main/java/com/example/codingagent/cli/chat/command/CostSlashCommand.java), [DoctorSlashCommand.java](src/main/java/com/example/codingagent/cli/chat/command/DoctorSlashCommand.java), [VersionSlashCommand.java](src/main/java/com/example/codingagent/cli/chat/command/VersionSlashCommand.java) |
-| Provider / model / base-url 路由 | 已对齐 | [RoutingAgentModelGateway.java](src/main/java/com/example/codingagent/model/RoutingAgentModelGateway.java), [OpenAiAgentModelGateway.java](src/main/java/com/example/codingagent/model/OpenAiAgentModelGateway.java), [ModelSlashCommand.java](src/main/java/com/example/codingagent/cli/chat/command/ModelSlashCommand.java) |
+| Provider / model / base-url 路由 | 已对齐，并补齐 provider-aware 默认模型解析与 `/model` help/current/menu 语义 | [RoutingAgentModelGateway.java](src/main/java/com/example/codingagent/model/RoutingAgentModelGateway.java), [OpenAiAgentModelGateway.java](src/main/java/com/example/codingagent/model/OpenAiAgentModelGateway.java), [ModelSlashCommand.java](src/main/java/com/example/codingagent/cli/chat/command/ModelSlashCommand.java), [ModelSettingService.java](src/main/java/com/example/codingagent/model/ModelSettingService.java), [AgentRuntimeFactory.java](src/main/java/com/example/codingagent/runtime/AgentRuntimeFactory.java) |
 | 历史压缩与 prompt 注入治理 | 已对齐 | [OpenAiDecisionPromptBuilder.java](src/main/java/com/example/codingagent/model/OpenAiDecisionPromptBuilder.java), [AgentProperties.java](src/main/java/com/example/codingagent/config/AgentProperties.java) |
 | 工作区路径和 shell 安全护栏 | 已对齐 | [WorkspacePathResolver.java](src/main/java/com/example/codingagent/tool/WorkspacePathResolver.java), [BashExecTool.java](src/main/java/com/example/codingagent/tool/BashExecTool.java) |
 | 更完整的流式终端 UI / TUI 渲染 | 未对齐 | - |
@@ -81,12 +81,20 @@ sh ./mvnw -q -DskipTests spring-boot:run -Dspring-boot.run.arguments="run --prov
 
 更多 CLI 示例、chat 示例、会话恢复示例和 OpenAI 兼容地址示例见 [docs/examples.md](docs/examples.md)。
 
+也可以直接体验当前 `/model` 语义：
+
+```bash
+printf '/model help\n/model current\n/provider openai\n/model\n/quit\n' | sh ./mvnw -q -DskipTests spring-boot:run -Dspring-boot.run.arguments='chat --provider mock --session-id demo-chat-model'
+```
+
 ## 当前已落地能力
 
 - 默认 root 入口直接进入交互式 chat
 - `run`、`chat`、`doctor` 三类核心 CLI 命令
 - `/help`、`/status`、`/tools`、`/files`、`/cost`、`/doctor`、`/version`、`/clear`、`/resume`、`/rename`、`/model`、`/provider`、`/base-url`、`/exit`、`/quit`
+- `/model` 已支持 Claude Code 风格的 `help`、`current` 参数；空命令会打开 text-mode model selection menu
 - `mock`、`openai` 两种 provider，以及配置文件、环境变量、命令行三级 base URL 覆盖
+- provider-aware 默认模型：`mock -> mock-coder`，`openai -> gpt-4.1-mini`
 - `list_files`、`read_file`、`grep_text`、`bash_exec`、`write_file`、`patch_file` 六类本地工具
 - `.agent/sessions` 下的 JSONL transcript 持久化、同 `session-id` 历史续跑、会话标题和上下文文件索引
 - `/status`、`/cost`、`/doctor`、`/version` 这类会话内运行时视图
@@ -101,6 +109,8 @@ sh ./mvnw -q -DskipTests spring-boot:run -Dspring-boot.run.arguments="run --prov
 - `agent.runtime.transcript.recent-entries=8`
 - `agent.runtime.transcript.summary-entries=4`
 - `agent.runtime.transcript.max-entry-chars=160`
+- `agent.model.provider-defaults.*` 可为不同 provider 指定默认模型
+- `agent.model.provider-presets.*` 可配置 `/model` text-mode menu 中展示的推荐模型
 - `agent.model.prompt.system-lines` 可覆写 OpenAI 决策器的 system prompt 文案
 
 建议继续阅读：

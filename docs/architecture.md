@@ -83,6 +83,8 @@ flowchart TD
   - 表示一个交互式本地命令
 - `ChatSlashCommandDispatcher`
   - 负责按名称/别名分发 slash command
+- `ModelSettingService`
+  - 负责统一管理模型设置语义、provider 默认模型解析和 `/model` 命令可观察行为
 - `SessionService`
   - 负责统一管理 transcript 与会话元数据
 - `DoctorSummaryService`
@@ -98,8 +100,9 @@ flowchart TD
     A --> C["ChatSlashCommandDispatcher"]
     C --> D["/status /tools /files /cost /doctor /version /help /exit"]
     C --> E["/clear /resume /rename /model /provider /base-url"]
-    A --> F["AgentRunnerFacade"]
-    B --> F
+    C --> F["ModelSettingService"]
+    A --> G["AgentRunnerFacade"]
+    B --> G
 ```
 
 ## 4. 核心流程
@@ -179,6 +182,7 @@ flowchart TD
 职责：
 
 - provider 路由
+- 模型设置与 provider-aware 默认模型解析
 - prompt 组装
 - 结构化决策协议说明、解析与校验
 
@@ -195,12 +199,16 @@ flowchart TD
 - decision protocol
   - 负责定义“模型该返回什么结构”以及“如何把文本解码成领域对象”
   - 如 `AgentDecisionProtocol` / `JsonAgentDecisionProtocol`
+- model setting service
+  - 负责让 CLI 中的模型设置行为与 runtime 中的实际模型解析保持一致
+  - 如 `ModelSettingService`
 
 这样做的原因是：
 
 - provider 更换时，不需要复制粘贴 JSON 提取逻辑
 - prompt builder 和 response parser 可以围绕同一协议对象协作
 - 后续从 JSON 迁移到更强的结构化协议时，影响面更小
+- `/model` 命令看到的“当前模型/默认模型”与真正运行时使用的模型不会分叉
 
 ### `tool`
 

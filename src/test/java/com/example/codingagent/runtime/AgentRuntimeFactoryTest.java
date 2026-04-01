@@ -3,6 +3,7 @@ package com.example.codingagent.runtime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.example.codingagent.config.AgentProperties;
+import com.example.codingagent.model.ModelSettingService;
 import com.example.codingagent.model.OpenAiConfigurationResolver;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.env.MockEnvironment;
@@ -19,7 +20,8 @@ class AgentRuntimeFactoryTest {
 
         AgentRuntimeFactory factory = new AgentRuntimeFactory(
                 properties,
-                new OpenAiConfigurationResolver(properties, new MockEnvironment())
+                new OpenAiConfigurationResolver(properties, new MockEnvironment()),
+                new ModelSettingService(properties)
         );
 
         AgentRuntimeContext context = factory.create(
@@ -42,7 +44,8 @@ class AgentRuntimeFactoryTest {
 
         AgentRuntimeFactory factory = new AgentRuntimeFactory(
                 properties,
-                new OpenAiConfigurationResolver(properties, environment)
+                new OpenAiConfigurationResolver(properties, environment),
+                new ModelSettingService(properties)
         );
 
         AgentRuntimeContext context = factory.create(
@@ -53,5 +56,26 @@ class AgentRuntimeFactoryTest {
         assertThat(context.provider()).isEqualTo("mock");
         assertThat(context.model()).isEqualTo("mock-coder");
         assertThat(context.baseUrl()).isEqualTo("https://env.example");
+    }
+
+    @Test
+    void shouldResolveProviderSpecificDefaultModelWhenProviderChanges() {
+        AgentProperties properties = new AgentProperties();
+        properties.getModel().setProvider("mock");
+        properties.getModel().setModel("mock-coder");
+
+        AgentRuntimeFactory factory = new AgentRuntimeFactory(
+                properties,
+                new OpenAiConfigurationResolver(properties, new MockEnvironment()),
+                new ModelSettingService(properties)
+        );
+
+        AgentRuntimeContext context = factory.create(
+                new AgentSession("session-3", java.nio.file.Path.of(".agent/sessions/session-3.jsonl")),
+                new RunRequest("prompt", "openai", null, null, "session-3")
+        );
+
+        assertThat(context.provider()).isEqualTo("openai");
+        assertThat(context.model()).isEqualTo("gpt-4.1-mini");
     }
 }
