@@ -62,7 +62,10 @@ public class ResumeSlashCommand implements ChatSlashCommand {
         List<String> lines = new ArrayList<>();
         lines.add("Recent conversations:");
         for (SessionSummary session : sessions) {
-            lines.add("- " + session.sessionId() + "  " + session.preview());
+            String displayName = session.title() == null || session.title().isBlank()
+                    ? session.preview()
+                    : session.title() + "  " + session.preview();
+            lines.add("- " + session.sessionId() + "  " + displayName);
         }
         lines.add("Run /resume <session-id> to switch to a conversation.");
         return lines;

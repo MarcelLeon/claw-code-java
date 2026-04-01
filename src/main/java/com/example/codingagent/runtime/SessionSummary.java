@@ -8,6 +8,7 @@ import java.time.Instant;
 public record SessionSummary(
         String sessionId,
         Instant modifiedAt,
+        String title,
         String preview
 ) {
 }

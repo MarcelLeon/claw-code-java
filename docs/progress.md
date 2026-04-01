@@ -76,9 +76,12 @@
 - 创建 README 和本进度文档
 - 创建架构文档，明确“行为等价复刻”而非文件级翻译
 - 建立 CLI 启动骨架：`RootCommand`、`doctor`、`run`
+- 调整 root 默认行为：无子命令时直接进入 chat，会话体验更贴近 Claude Code CLI
 - 增加 `chat` 交互式 REPL 入口，并复用同一 runtime 主链路
 - 抽象 chat slash command 模型，支持 `/help`、`/status`、`/tools`、`/exit`
 - 增强 chat 会话控制，支持 `/clear`、`/resume`、`/model`
+- 补齐 chat 会话运行时覆盖控制，支持在 REPL 内查看/切换 `/provider`、`/base-url`
+- 增加 `/rename`，并抽象独立会话元数据存储，支持显示自定义标题
 - 抽象 `ChatSessionState`，把交互式会话状态从 REPL 逻辑中分离
 - 建立最小 Agent Loop：`AgentRunnerFacade` -> `CodingAgentEngine`
 - 建立模型路由：`mock`、`openai`
@@ -100,7 +103,8 @@
 ### 当前阶段状态
 
 - 阶段一：已完成并通过测试
-- 阶段二：已完成“真实模型接入骨架”、`openai` provider 路由、base URL 覆盖链路、基础会话续跑、transcript 压缩窗口、可配置 system prompt 组装，以及工作区内安全文件修改能力；正在继续增强工具协议和恢复能力
+- 阶段二：已完成“真实模型接入骨架”、`openai` provider 路由、base URL 覆盖链路、基础会话续跑、transcript 压缩窗口、可配置 system prompt 组装，以及工作区内安全文件修改能力；chat 会话内的 provider / model / base URL 覆盖也已打通，正在继续增强工具协议和恢复能力
+- 当前增量重点：围绕 Claude Code 的默认 chat 体验继续补足会话命令面，最新已补 `/rename` 与会话标题展示
 
 ## 5. 当前代码地图
 
@@ -133,6 +137,7 @@
    - [BashExecTool.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/tool/BashExecTool.java)
 6. 持久化与测试
    - [TranscriptStore.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/persistence/TranscriptStore.java)
+   - [SessionMetadataStore.java](/Users/wangzq/VsCodeProjects/claude-code/src/main/java/com/example/codingagent/persistence/SessionMetadataStore.java)
    - [CodingAgentEngineTest.java](/Users/wangzq/VsCodeProjects/claude-code/src/test/java/com/example/codingagent/runtime/CodingAgentEngineTest.java)
 
 ## 6. 已验证结果
@@ -144,9 +149,12 @@
 - `sh ./mvnw test`
 - `sh ./mvnw -q -DskipTests package`
 - `doctor` CLI 实跑
+- 无子命令直接进入 chat 的 root CLI 实跑
 - `chat --provider mock --session-id demo-chat` CLI 实跑
 - `chat --provider mock --session-id demo-chat-slash` 下的 `/status`、`/tools`、`/help`、`/exit` CLI 实跑
 - `chat --provider mock --session-id demo-live-session` 下的 `/resume`、`/clear`、`/model` CLI 实跑
+- `chat --provider mock --session-id smoke-rename-*` 下的 `/rename`、标题生成与 `/resume` 标题展示 CLI 实跑
+- `chat` 会话内 `/provider`、`/base-url` 的查看、切换与恢复默认值测试
 - `java -jar target/coding-agent-cli-0.1.0-SNAPSHOT.jar doctor` 实跑
 - `run --prompt '请读取 README'` CLI 实跑
 - `run --prompt '请执行一个 pwd 命令'` CLI 实跑
@@ -164,7 +172,9 @@
 - 本地 `mock` provider 已完成 CLI -> Agent Loop -> Tool -> Final Answer 的闭环
 - `chat` 已具备最小持续会话体验，并在同一 session 内复用历史 transcript
 - `chat` 的会话控制命令已被抽象为独立模块，而不是散落在 REPL 循环中的条件分支
-- `chat` 已支持会话级控制：新建会话、切换到已有会话、查看/切换当前模型
+- root 默认入口已不再只是帮助页，而是直接落到默认 chat，会话式体验更贴近 Claude Code
+- `chat` 已支持会话级控制：新建会话、切换到已有会话、查看/切换当前 provider、模型和 base URL
+- `chat` 已支持会话标题：可通过 `/rename` 显式设置，也可基于历史首条用户消息生成 kebab-case 标题
 - 工具执行结果已能反馈回下一轮模型决策
 - 读、搜、执行命令、写文件四类基础动作均已闭环验证
 - `bash_exec` 已具备基础安全护栏，可拦截典型危险命令并限制执行时长
@@ -191,6 +201,7 @@
 
 - 把当前基于正则的 `bash_exec` 安全策略扩展为更明确的权限模式、白名单和审计
 - 增加阶段性架构文档，方便继续魔改
+- 继续补足 Claude Code 风格的 session / status / cost / files 命令面
 
 ## 8. 接手说明
 

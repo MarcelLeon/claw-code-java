@@ -1,6 +1,8 @@
 package com.example.codingagent.runtime;
 
 import com.example.codingagent.config.AgentProperties;
+import com.example.codingagent.persistence.SessionMetadata;
+import com.example.codingagent.persistence.SessionMetadataStore;
 import com.example.codingagent.persistence.TranscriptEntry;
 import com.example.codingagent.persistence.TranscriptStore;
 import java.io.IOException;
@@ -21,10 +23,19 @@ public class SessionService {
 
     private final AgentProperties agentProperties;
     private final TranscriptStore transcriptStore;
+    private final SessionMetadataStore sessionMetadataStore;
+    private final SessionTitleGenerator sessionTitleGenerator;
 
-    public SessionService(AgentProperties agentProperties, TranscriptStore transcriptStore) {
+    public SessionService(
+            AgentProperties agentProperties,
+            TranscriptStore transcriptStore,
+            SessionMetadataStore sessionMetadataStore,
+            SessionTitleGenerator sessionTitleGenerator
+    ) {
         this.agentProperties = agentProperties;
         this.transcriptStore = transcriptStore;
+        this.sessionMetadataStore = sessionMetadataStore;
+        this.sessionTitleGenerator = sessionTitleGenerator;
     }
 
     /**
@@ -58,6 +69,38 @@ public class SessionService {
      */
     public boolean sessionExists(String sessionId) {
         return Files.exists(sessionPath(sessionId));
+    }
+
+    /**
+     * 保存会话自定义标题。
+     *
+     * @param sessionId 会话 ID
+     * @param title 标题
+     */
+    public void renameSession(String sessionId, String title) {
+        sessionMetadataStore.saveCustomTitle(openSession(sessionId), title);
+    }
+
+    /**
+     * 读取会话自定义标题。
+     *
+     * @param sessionId 会话 ID
+     * @return 自定义标题，不存在时返回 null
+     */
+    public String getCustomTitle(String sessionId) {
+        SessionMetadata metadata = sessionMetadataStore.load(openSession(sessionId));
+        return metadata.customTitle();
+    }
+
+    /**
+     * 根据当前历史生成标题。
+     *
+     * @param sessionId 会话 ID
+     * @return 生成结果，没有足够内容时返回 null
+     */
+    public String generateSessionTitle(String sessionId) {
+        List<TranscriptEntry> entries = transcriptStore.loadTranscript(openSession(sessionId));
+        return sessionTitleGenerator.generate(entries);
     }
 
     /**
@@ -101,13 +144,14 @@ public class SessionService {
         String sessionId = fileName.substring(0, fileName.length() - ".jsonl".length());
         AgentSession session = new AgentSession(sessionId, path);
         List<TranscriptEntry> entries = transcriptStore.loadTranscript(session);
+        String title = sessionMetadataStore.load(session).customTitle();
         String preview = entries.stream()
                 .filter(entry -> "user".equals(entry.role()))
                 .reduce((first, second) -> second)
                 .or(() -> entries.stream().reduce((first, second) -> second))
                 .map(entry -> truncate(entry.content()))
                 .orElse("(空会话)");
-        return new SessionSummary(sessionId, lastModifiedTime(path), preview);
+        return new SessionSummary(sessionId, lastModifiedTime(path), title, preview);
     }
 
     private String truncate(String content) {

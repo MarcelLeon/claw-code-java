@@ -70,4 +70,22 @@ public class ChatSessionState {
     public void updateModel(String newModel) {
         this.model = newModel;
     }
+
+    /**
+     * 更新当前 provider 覆盖值。
+     *
+     * @param newProvider 新 provider，允许为 null 表示清空覆盖
+     */
+    public void updateProvider(String newProvider) {
+        this.provider = newProvider;
+    }
+
+    /**
+     * 更新当前 baseUrl 覆盖值。
+     *
+     * @param newBaseUrl 新 baseUrl，允许为 null 表示清空覆盖
+     */
+    public void updateBaseUrl(String newBaseUrl) {
+        this.baseUrl = newBaseUrl;
+    }
 }

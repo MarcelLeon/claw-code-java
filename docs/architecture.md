@@ -11,6 +11,7 @@
 - Model Gateway 负责把统一领域模型映射到具体大模型供应商
 - Tool Layer 负责在工作区内执行本地能力
 - Persistence 负责 transcript 持久化与续跑
+- Session Metadata 负责会话标题等轻量状态
 
 ## 2. 对齐 Claude Code 的抽象映射
 
@@ -49,6 +50,9 @@
   - 表示工具执行结果
 - `TranscriptEntry`
   - 表示持久化会话中的一条记录
+- `SessionMetadata`
+  - 表示会话的轻量侧边元数据
+  - 当前用于承载 `/rename` 写入的自定义标题
 
 这些对象的关系是：
 
@@ -67,11 +71,13 @@ flowchart TD
 对交互式 `chat`，还有一组会话级对象：
 
 - `ChatSessionState`
-  - 表示 REPL 当前选中的会话和模型覆盖
+  - 表示 REPL 当前选中的会话，以及 provider / model / baseUrl 覆盖
 - `ChatSlashCommand`
   - 表示一个交互式本地命令
 - `ChatSlashCommandDispatcher`
   - 负责按名称/别名分发 slash command
+- `SessionService`
+  - 负责统一管理 transcript 与会话元数据
 
 它们与 runtime 的关系是：
 
@@ -80,7 +86,7 @@ flowchart TD
     A["ChatSessionRunner"] --> B["ChatSessionState"]
     A --> C["ChatSlashCommandDispatcher"]
     C --> D["/status /tools /help /exit"]
-    C --> E["/clear /resume /model"]
+    C --> E["/clear /resume /rename /model /provider /base-url"]
     A --> F["AgentRunnerFacade"]
     B --> F
 ```
@@ -109,6 +115,8 @@ flowchart TD
 ```mermaid
 flowchart TD
     A["CLI Command"] --> B["AgentRunnerFacade"]
+    A --> R["RootCommand default chat"]
+    R --> B
     B --> C["SessionService"]
     B --> D["AgentRuntimeFactory"]
     B --> E["CodingAgentEngine"]
@@ -133,7 +141,7 @@ flowchart TD
 - 渲染终端输出
 - 收口异常
 - 管理交互式 chat 的 slash command 分发
-- 持有 chat 会话级状态，例如当前 `session-id` 和模型覆盖
+- 持有 chat 会话级状态，例如当前 `session-id`、provider / model / baseUrl 覆盖
 
 不负责：
 
@@ -201,6 +209,7 @@ flowchart TD
 职责：
 
 - transcript 读写
+- 会话元数据读写
 - 为续跑提供历史记录
 
 不负责：
@@ -221,7 +230,7 @@ flowchart TD
 
 下一轮继续保持同一原则推进：
 
-- 在现有 `chat` / slash command 模型上继续丰富交互体验
+- 在现有 `chat` / slash command 模型上继续丰富交互体验，并让会话内覆盖链路与 `run` 命令保持一致
 - 把当前 JSON 决策协议升级为更稳的结构化协议
 - 把 transcript 续跑从“原始记录回放”提升为更完整的 session runtime
 - 为工具权限、流式输出和命令策略增加独立边界

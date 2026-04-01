@@ -1,5 +1,6 @@
 package com.example.codingagent.cli.chat.command;
 
+import com.example.codingagent.runtime.SessionService;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -9,6 +10,12 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class StatusSlashCommand implements ChatSlashCommand {
+
+    private final SessionService sessionService;
+
+    public StatusSlashCommand(SessionService sessionService) {
+        this.sessionService = sessionService;
+    }
 
     @Override
     public String name() {
@@ -22,8 +29,10 @@ public class StatusSlashCommand implements ChatSlashCommand {
 
     @Override
     public ChatSlashCommandResult execute(ChatSlashCommandRequest request) {
+        String title = sessionService.getCustomTitle(request.sessionState().sessionId());
         return ChatSlashCommandResult.output(List.of(
                 "session: " + request.sessionState().sessionId(),
+                "title: " + fallback(title, "(untitled)"),
                 "provider: " + fallback(request.sessionState().provider(), "(default)"),
                 "model: " + fallback(request.sessionState().model(), "(default)"),
                 "base-url: " + fallback(request.sessionState().baseUrl(), "(default)")
