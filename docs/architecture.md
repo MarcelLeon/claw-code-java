@@ -50,6 +50,7 @@
   - 表示工具执行结果
 - `TranscriptEntry`
   - 表示持久化会话中的一条记录
+  - 当前包含 role、content、timestamp，用于续跑和本地成本统计
 - `SessionMetadata`
   - 表示会话的轻量侧边元数据
   - 当前用于承载 `/rename` 写入的自定义标题，以及 `/files` 所需的上下文文件索引

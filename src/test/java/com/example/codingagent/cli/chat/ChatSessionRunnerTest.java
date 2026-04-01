@@ -73,6 +73,7 @@ class ChatSessionRunnerTest {
         assertThat(text).contains("connectivity: not checked (run doctor to verify)");
         assertThat(text).contains("tools: ");
         assertThat(text).contains("messages: total=0, user=0, assistant=0, tool=0");
+        assertThat(text).contains("duration: unavailable (legacy transcript has no timestamps)");
         assertThat(text).contains("billing: unavailable (provider token usage not tracked yet)");
         assertThat(text).contains("No files in context");
         assertThat(text).contains("Could not generate a name: no conversation context yet. Usage: /rename <name>");
@@ -103,6 +104,7 @@ class ChatSessionRunnerTest {
         assertThat(text).contains("provider: mock");
         assertThat(text).contains("base-url: (default)");
         assertThat(text).contains("context-files: 1");
+        assertThat(text).contains("duration: ");
         assertThat(text).contains("max-turns: 8");
         assertThat(text).contains("Set base-url to (default)");
         assertThat(text).contains("Set provider to (default)");

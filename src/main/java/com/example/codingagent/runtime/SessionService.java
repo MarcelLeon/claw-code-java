@@ -157,9 +157,19 @@ public class SessionService {
         int toolMessages = 0;
         int totalCharacters = 0;
         int toolOutputCharacters = 0;
+        Instant startedAt = null;
+        Instant lastUpdatedAt = null;
         for (TranscriptEntry entry : entries) {
             String content = entry.content() == null ? "" : entry.content();
             totalCharacters += content.length();
+            if (entry.timestamp() != null) {
+                if (startedAt == null || entry.timestamp().isBefore(startedAt)) {
+                    startedAt = entry.timestamp();
+                }
+                if (lastUpdatedAt == null || entry.timestamp().isAfter(lastUpdatedAt)) {
+                    lastUpdatedAt = entry.timestamp();
+                }
+            }
             switch (entry.role()) {
                 case "user" -> userMessages++;
                 case "assistant" -> assistantMessages++;
@@ -173,6 +183,9 @@ public class SessionService {
             }
         }
         int contextFileCount = sessionMetadataStore.load(session).contextFiles().size();
+        long durationSeconds = startedAt != null && lastUpdatedAt != null
+                ? Math.max(0L, lastUpdatedAt.getEpochSecond() - startedAt.getEpochSecond())
+                : 0L;
         return new SessionCostSummary(
                 entries.size(),
                 userMessages,
@@ -180,7 +193,10 @@ public class SessionService {
                 toolMessages,
                 totalCharacters,
                 toolOutputCharacters,
-                contextFileCount
+                contextFileCount,
+                startedAt,
+                lastUpdatedAt,
+                durationSeconds
         );
     }
 

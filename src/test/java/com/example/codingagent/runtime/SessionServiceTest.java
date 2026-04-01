@@ -35,6 +35,9 @@ class SessionServiceTest {
         assertThat(summary.totalCharacters()).isGreaterThan(0);
         assertThat(summary.toolOutputCharacters()).isGreaterThan(0);
         assertThat(summary.contextFileCount()).isEqualTo(1);
+        assertThat(summary.startedAt()).isNotNull();
+        assertThat(summary.lastUpdatedAt()).isNotNull();
+        assertThat(summary.durationSeconds()).isGreaterThanOrEqualTo(0);
     }
 
     @Test
@@ -50,5 +53,8 @@ class SessionServiceTest {
         assertThat(summary.totalCharacters()).isZero();
         assertThat(summary.toolOutputCharacters()).isZero();
         assertThat(summary.contextFileCount()).isZero();
+        assertThat(summary.startedAt()).isNull();
+        assertThat(summary.lastUpdatedAt()).isNull();
+        assertThat(summary.durationSeconds()).isZero();
     }
 }

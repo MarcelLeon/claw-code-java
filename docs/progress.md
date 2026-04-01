@@ -85,6 +85,7 @@
 - 增加 `/files`，并抽象会话级上下文文件索引，跟踪进入上下文的文件
 - 增加 `/cost`，基于本地 transcript 输出会话消息量、字符量和上下文文件统计
 - 增强 `/status`，抽象独立状态摘要服务，输出版本、工作区、配置与本地会话上下文概况
+- 为 transcript 记录增加时间戳，并让 `/cost` 输出本地持续时间统计，同时兼容旧 JSONL
 - 抽象 `ChatSessionState`，把交互式会话状态从 REPL 逻辑中分离
 - 建立最小 Agent Loop：`AgentRunnerFacade` -> `CodingAgentEngine`
 - 建立模型路由：`mock`、`openai`
@@ -160,6 +161,7 @@
 - `chat --provider mock --session-id smoke-files-*` 下的 `/files` 前后状态与上下文文件登记 CLI 实跑
 - `chat --provider mock --session-id smoke-cost-*` 下的 `/cost` 会话统计 CLI 实跑
 - `chat --provider mock --session-id smoke-status-*` 下的 `/status` 扩展状态视图 CLI 实跑
+- `chat --provider mock --session-id smoke-duration-*` 下的 `/cost` 持续时间统计 CLI 实跑
 - `chat` 会话内 `/provider`、`/base-url` 的查看、切换与恢复默认值测试
 - `java -jar target/coding-agent-cli-0.1.0-SNAPSHOT.jar doctor` 实跑
 - `run --prompt '请读取 README'` CLI 实跑
@@ -183,6 +185,7 @@
 - `chat` 已支持会话标题：可通过 `/rename` 显式设置，也可基于历史首条用户消息生成 kebab-case 标题
 - `chat` 已支持会话上下文文件索引：`read_file`、`write_file`、`patch_file` 命中的文件会登记到会话元数据，`/files` 可列出当前上下文文件
 - `chat` 已支持基础 `/cost` 视图：当前先基于本地 transcript 统计消息数、字符数和工具输出量，尚未接入真实 provider token/billing
+- `chat` 的 `/cost` 已支持本地持续时间统计；新会话会写入 transcript 时间戳，旧 JSONL 会降级显示 duration unavailable
 - `chat` 的 `/status` 已不再只是会话 ID/模型覆盖值，而是统一展示应用版本、工作区、配置状态、工具数量与上下文文件概况
 - 工具执行结果已能反馈回下一轮模型决策
 - 读、搜、执行命令、写文件四类基础动作均已闭环验证

@@ -60,12 +60,12 @@ class OpenAiDecisionPromptBuilderTest {
         );
 
         List<TranscriptEntry> transcriptEntries = List.of(
-                new TranscriptEntry("user", "第一轮用户问题需要较长描述"),
-                new TranscriptEntry("assistant", "第一轮回答说明已经完成初始分析"),
-                new TranscriptEntry("tool", "read_file -> README 第一段内容"),
-                new TranscriptEntry("user", "第二轮继续追问更多细节"),
-                new TranscriptEntry("assistant", "第二轮回答给出新的方向"),
-                new TranscriptEntry("tool", "grep_text -> docs/progress.md 命中")
+                new TranscriptEntry("user", "第一轮用户问题需要较长描述", null),
+                new TranscriptEntry("assistant", "第一轮回答说明已经完成初始分析", null),
+                new TranscriptEntry("tool", "read_file -> README 第一段内容", null),
+                new TranscriptEntry("user", "第二轮继续追问更多细节", null),
+                new TranscriptEntry("assistant", "第二轮回答给出新的方向", null),
+                new TranscriptEntry("tool", "grep_text -> docs/progress.md 命中", null)
         );
 
         Prompt prompt = builder.build(new AgentRequestContext(
@@ -102,8 +102,8 @@ class OpenAiDecisionPromptBuilderTest {
                 "请继续",
                 conversationState(
                         List.of(
-                                new TranscriptEntry("user", "第一条"),
-                                new TranscriptEntry("assistant", "第二条")
+                                new TranscriptEntry("user", "第一条", null),
+                                new TranscriptEntry("assistant", "第二条", null)
                         ),
                         List.of()
                 )

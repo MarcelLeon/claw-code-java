@@ -1,5 +1,6 @@
 package com.example.codingagent.cli.chat.command;
 
+import com.example.codingagent.runtime.DurationFormatter;
 import com.example.codingagent.runtime.SessionCostSummary;
 import com.example.codingagent.runtime.SessionService;
 import java.util.List;
@@ -36,11 +37,19 @@ public class CostSlashCommand implements ChatSlashCommand {
                         + ", user=" + summary.userMessages()
                         + ", assistant=" + summary.assistantMessages()
                         + ", tool=" + summary.toolMessages(),
+                "duration: " + renderDuration(summary),
                 "transcript-chars: " + summary.totalCharacters(),
                 "tool-output-chars: " + summary.toolOutputCharacters(),
                 "context-files: " + summary.contextFileCount(),
                 "billing: unavailable (provider token usage not tracked yet)",
                 "note: this is a local transcript-based estimate"
         ));
+    }
+
+    private String renderDuration(SessionCostSummary summary) {
+        if (summary.startedAt() == null || summary.lastUpdatedAt() == null) {
+            return "unavailable (legacy transcript has no timestamps)";
+        }
+        return DurationFormatter.formatSeconds(summary.durationSeconds());
     }
 }

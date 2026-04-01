@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
+import java.time.Instant;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -68,6 +69,7 @@ public class TranscriptStore {
         ObjectNode node = objectMapper.createObjectNode();
         node.put("role", role);
         node.put("content", content);
+        node.put("timestamp", Instant.now().toString());
         try {
             String line = objectMapper.writeValueAsString(node) + System.lineSeparator();
             Files.writeString(
